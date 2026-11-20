@@ -1,304 +1,1151 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="theme-color" content="#101c2c">
-<meta name="description" content="ACCS Consultoria. Inteligência, estratégia e gestão para transformar desafios em soluções.">
-<title>ACCS Consultoria | Inteligência e Estratégia</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ACCS CONSULTORIA — Livros digitais, e-books, apostilas e cursos</title>
+  <meta name="description" content="Loja virtual da ACCS CONSULTORIA: livros digitais, PDFs, e-books, apostilas e cursos. Catálogo, pesquisa, filtros e links de compra em Hotmart e Kiwify.">
+  <meta name="author" content="ACCS CONSULTORIA">
+  <meta name="robots" content="index, follow">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="ACCS CONSULTORIA — Loja Virtual">
+  <meta property="og:description" content="Livros digitais, PDFs, e-books, apostilas e cursos da ACCS CONSULTORIA.">
+  <meta property="og:site_name" content="ACCS CONSULTORIA">
+  <meta name="theme-color" content="#111111">
 
-<style>
-:root {
-  --navy: #101c2c;
-  --navy2: #172b40;
-  --gold: #c5a66b;
-  --light: #f5f5f1;
-  --white: #ffffff;
-  --gray: #667382;
-}
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet">
 
-* { box-sizing: border-box; margin: 0; padding: 0; }
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": "ACCS CONSULTORIA",
+    "url": "https://accsconsultoria.github.io/",
+    "description": "Loja virtual de livros digitais, PDFs, e-books, apostilas e cursos."
+  }
+  </script>
 
-html { scroll-behavior: smooth; }
+  <style>
+    :root{
+      --preto:#0f0f0f;
+      --cinza-900:#1a1a1a;
+      --cinza-700:#4a4a4a;
+      --cinza-500:#757575;
+      --cinza-300:#d7d7d7;
+      --cinza-100:#f3f3f3;
+      --branco:#ffffff;
+      --borda:#e6e6e6;
+      --raio:14px;
+      --sombra:0 10px 30px rgba(15,15,15,.06);
+      --transicao:.22s ease;
+    }
 
-body {
-  font-family: Inter, "Segoe UI", Arial, sans-serif;
-  background: var(--light);
-  color: var(--navy);
-}
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{
+      margin:0;
+      background:var(--branco);
+      color:var(--cinza-900);
+      font-family:"Inter",system-ui,-apple-system,BlinkMacSystemFont,sans-serif;
+      font-size:16px;
+      line-height:1.6;
+      -webkit-font-smoothing:antialiased;
+    }
 
-a { text-decoration: none; color: inherit; }
+    a{color:inherit;text-decoration:none}
+    img{max-width:100%;display:block}
+    button,input,select{font:inherit}
 
-header {
-  height: 88px;
-  padding: 0 8%;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  background: var(--navy);
-  color: white;
-}
+    .container{
+      width:min(1180px,100%);
+      margin:0 auto;
+      padding:0 20px;
+    }
 
-.logo {
-  font-size: 21px;
-  font-weight: 800;
-  letter-spacing: 2px;
-}
+    .topo{
+      position:sticky;
+      top:0;
+      z-index:50;
+      background:rgba(255,255,255,.94);
+      backdrop-filter:blur(14px);
+      border-bottom:1px solid var(--borda);
+    }
 
-.logo span { color: var(--gold); }
+    .topo-interno{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:20px;
+      min-height:74px;
+    }
 
-nav { display: flex; gap: 30px; align-items: center; }
+    .marca{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      font-family:"Playfair Display",serif;
+      font-size:1.28rem;
+      font-weight:700;
+      letter-spacing:.04em;
+      text-transform:uppercase;
+      white-space:nowrap;
+    }
 
-nav a {
-  font-size: 13px;
-  color: #d0d8df;
-  transition: .2s;
-}
+    .marca-sigla{
+      display:grid;
+      place-items:center;
+      width:42px;
+      height:42px;
+      border:1px solid var(--preto);
+      border-radius:50%;
+      font-family:"Inter",sans-serif;
+      font-size:.72rem;
+      font-weight:700;
+      letter-spacing:.08em;
+    }
 
-nav a:hover { color: var(--gold); }
+    .navegacao{
+      display:flex;
+      align-items:center;
+      gap:26px;
+    }
 
-.nav-button {
-  border: 1px solid var(--gold);
-  padding: 12px 19px;
-  color: var(--gold);
-}
+    .navegacao a{
+      font-size:.86rem;
+      font-weight:500;
+      letter-spacing:.08em;
+      text-transform:uppercase;
+      color:var(--cinza-700);
+      transition:color var(--transicao);
+    }
 
-.hero {
-  min-height: 620px;
-  padding: 100px 10%;
-  background:
-    radial-gradient(ellipse at 85% 35%, #28415a 0%, transparent 45%),
-    linear-gradient(120deg, #101c2c, #172b40);
-  color: white;
-  display: flex;
-  align-items: center;
-  position: relative;
-  overflow: hidden;
-}
+    .navegacao a:hover,
+    .navegacao a.ativo{color:var(--preto)}
 
-.hero-content { max-width: 780px; position: relative; z-index: 1; }
+    .menu-botao{
+      display:none;
+      border:1px solid var(--borda);
+      background:transparent;
+      border-radius:10px;
+      padding:10px 12px;
+      cursor:pointer;
+    }
 
-.eyebrow {
-  color: var(--gold);
-  letter-spacing: 4px;
-  font-size: 11px;
-  font-weight: 700;
-  margin-bottom: 28px;
-}
+    .menu-botao span{
+      display:block;
+      width:20px;
+      height:2px;
+      background:var(--preto);
+      margin:4px 0;
+    }
 
-h1 {
-  font-size: clamp(42px, 6vw, 72px);
-  line-height: 1.09;
-  letter-spacing: -2px;
-  margin-bottom: 27px;
-}
+    .hero{
+      padding:88px 0 72px;
+      border-bottom:1px solid var(--borda);
+      background:
+        radial-gradient(circle at 90% 10%, #f6f6f6 0%, transparent 38%),
+        var(--branco);
+    }
 
-h1 span { color: var(--gold); }
+    .hero-conteudo{
+      max-width:760px;
+    }
 
-.hero p {
-  color: #c4cfda;
-  font-size: 18px;
-  line-height: 1.8;
-  max-width: 590px;
-}
+    .selo{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      border:1px solid var(--cinza-300);
+      border-radius:999px;
+      padding:7px 14px;
+      font-size:.72rem;
+      font-weight:600;
+      letter-spacing:.14em;
+      text-transform:uppercase;
+      color:var(--cinza-700);
+      margin-bottom:26px;
+    }
 
-.hero-link {
-  display: inline-block;
-  margin-top: 38px;
-  background: var(--gold);
-  color: var(--navy);
-  padding: 17px 27px;
-  font-size: 12px;
-  font-weight: 800;
-  letter-spacing: 1px;
-}
+    h1,
+    h2,
+    h3{
+      font-family:"Playfair Display",serif;
+      font-weight:600;
+      line-height:1.15;
+      margin:0;
+    }
 
-.hero-link:hover { background: white; }
+    h1{
+      font-size:clamp(2.4rem,6vw,4.2rem);
+      letter-spacing:-.02em;
+    }
 
-.hero-decoration {
-  position: absolute;
-  right: -100px;
-  bottom: -200px;
-  width: 550px;
-  height: 550px;
-  border: 1px solid rgba(197,166,107,.25);
-  border-radius: 50%;
-}
+    h2{font-size:clamp(1.7rem,3.4vw,2.5rem)}
 
-.hero-decoration:before {
-  content: "";
-  position: absolute;
-  inset: 45px;
-  border: 1px solid rgba(197,166,107,.2);
-  border-radius: 50%;
-}
+    h3{font-size:1.15rem}
 
-section { padding: 105px 10%; }
+    .hero p{
+      max-width:620px;
+      margin:24px 0 34px;
+      color:var(--cinza-700);
+      font-size:1.08rem;
+    }
 
-.section-label {
-  color: #a4844d;
-  font-size: 11px;
-  letter-spacing: 3px;
-  font-weight: 800;
-  margin-bottom: 20px;
-}
+    .acoes{
+      display:flex;
+      flex-wrap:wrap;
+      gap:12px;
+    }
 
-h2 {
-  font-size: clamp(30px, 4vw, 44px);
-  line-height: 1.2;
-  letter-spacing: -1px;
-  max-width: 700px;
-}
+    .botao{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      min-height:52px;
+      padding:0 26px;
+      border-radius:999px;
+      border:1px solid var(--preto);
+      background:var(--preto);
+      color:var(--branco);
+      font-size:.85rem;
+      font-weight:600;
+      letter-spacing:.1em;
+      text-transform:uppercase;
+      cursor:pointer;
+      transition:transform var(--transicao),opacity var(--transicao),background var(--transicao),color var(--transicao);
+    }
 
-.intro {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 70px;
-  align-items: center;
-}
+    .botao:hover{transform:translateY(-2px);opacity:.9}
 
-.intro-text {
-  color: var(--gray);
-  line-height: 1.9;
-  font-size: 16px;
-}
+    .botao-claro{
+      background:transparent;
+      color:var(--preto);
+    }
 
-.intro-mark {
-  border-left: 3px solid var(--gold);
-  padding: 25px 30px;
-  background: white;
-  color: var(--navy);
-  font-size: 19px;
-  line-height: 1.7;
-}
+    .botao-claro:hover{background:var(--cinza-100)}
 
-.services {
-  background: #eaece9;
-}
+    .botao-comprar{
+      width:100%;
+      margin-top:14px;
+    }
 
-.services-header {
-  margin-bottom: 55px;
-}
+    .secao{
+      padding:74px 0;
+      border-bottom:1px solid var(--borda);
+    }
 
-.service-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 20px;
-}
+    .secao-cabecalho{
+      display:flex;
+      align-items:flex-end;
+      justify-content:space-between;
+      gap:24px;
+      margin-bottom:34px;
+    }
 
-.service-card {
-  background: white;
-  padding: 38px 30px;
-  min-height: 240px;
-  border-top: 3px solid transparent;
-  transition: .25s;
-}
+    .secao-cabecalho p{
+      margin:10px 0 0;
+      max-width:560px;
+      color:var(--cinza-500);
+    }
 
-.service-card:hover {
-  transform: translateY(-5px);
-  border-top-color: var(--gold);
-}
+    .grade{
+      display:grid;
+      grid-template-columns:repeat(3,1fr);
+      gap:22px;
+    }
 
-.service-number {
-  color: var(--gold);
-  font-size: 13px;
-  letter-spacing: 2px;
-  margin-bottom: 30px;
-}
+    .produto{
+      display:flex;
+      flex-direction:column;
+      overflow:hidden;
+      border:1px solid var(--borda);
+      border-radius:var(--raio);
+      background:var(--branco);
+      transition:transform var(--transicao),box-shadow var(--transicao);
+    }
 
-.service-card h3 {
-  font-size: 20px;
-  margin-bottom: 15px;
-}
+    .produto:hover{
+      transform:translateY(-4px);
+      box-shadow:var(--sombra);
+    }
 
-.service-card p {
-  font-size: 14px;
-  color: var(--gray);
-  line-height: 1.8;
-}
+    .produto-capa{
+      position:relative;
+      aspect-ratio:3/4;
+      overflow:hidden;
+      background:linear-gradient(135deg,#f4f4f4,#e9e9e9);
+    }
 
-.principles {
-  background: var(--navy);
-  color: white;
-}
+    .produto-capa img{
+      width:100%;
+      height:100%;
+      object-fit:cover;
+    }
 
-.principles h2 { margin-bottom: 45px; }
+    .produto-capa-vazia{
+      position:absolute;
+      inset:0;
+      display:grid;
+      place-items:center;
+      color:var(--cinza-500);
+      font-size:.78rem;
+      letter-spacing:.1em;
+      text-transform:uppercase;
+    }
 
-.principle-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 40px;
-}
+    .etiquetas{
+      position:absolute;
+      top:14px;
+      left:14px;
+      display:flex;
+      flex-wrap:wrap;
+      gap:6px;
+    }
 
-.principle {
-  border-top: 1px solid #536274;
-  padding-top: 25px;
-}
+    .etiqueta{
+      border-radius:999px;
+      padding:5px 10px;
+      font-size:.64rem;
+      font-weight:700;
+      letter-spacing:.09em;
+      text-transform:uppercase;
+    }
 
-.principle h3 {
-  color: var(--gold);
-  font-size: 18px;
-  margin-bottom: 13px;
-}
+    .etiqueta-destaque{background:var(--preto);color:var(--branco)}
+    .etiqueta-lancamento{background:var(--branco);color:var(--preto);border:1px solid var(--preto)}
 
-.principle p {
-  color: #bac5d0;
-  font-size: 14px;
-  line-height: 1.8;
-}
+    .produto-info{
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+      padding:20px;
+      flex:1;
+    }
 
-.contact {
-  text-align: center;
-  background: white;
-}
+    .produto-categoria{
+      font-size:.68rem;
+      font-weight:600;
+      letter-spacing:.12em;
+      text-transform:uppercase;
+      color:var(--cinza-500);
+    }
 
-.contact h2 {
-  margin: 0 auto 20px;
-}
+    .produto-nome{
+      font-family:"Playfair Display",serif;
+      font-size:1.18rem;
+      font-weight:600;
+      line-height:1.3;
+    }
 
-.contact p {
-  color: var(--gray);
-  line-height: 1.8;
-  max-width: 570px;
-  margin: 0 auto;
-}
+    .produto-descricao{
+      margin:0;
+      color:var(--cinza-700);
+      font-size:.92rem;
+    }
 
-.contact-label {
-  display: inline-block;
-  margin-top: 35px;
-  padding: 15px 25px;
-  border: 1px solid var(--gold);
-  color: #927344;
-  font-size: 12px;
-  letter-spacing: 1px;
-  font-weight: bold;
-}
+    .produto-preco{
+      margin-top:auto;
+      font-size:1.05rem;
+      font-weight:700;
+    }
 
-footer {
-  background: #0b1420;
-  color: #9eacba;
-  padding: 35px 8%;
-  display: flex;
-  justify-content: space-between;
-  gap: 20px;
-  flex-wrap: wrap;
-  font-size: 12px;
-}
+    .produto-preco span{
+      display:block;
+      font-size:.72rem;
+      font-weight:500;
+      color:var(--cinza-500);
+    }
 
-footer strong { color: white; letter-spacing: 1px; }
+    .vazio{
+      border:1px dashed var(--cinza-300);
+      border-radius:var(--raio);
+      padding:44px 24px;
+      text-align:center;
+      color:var(--cinza-700);
+      background:var(--cinza-100);
+    }
 
-@media(max-width: 760px) {
-  header { height: auto; padding: 25px 6%; }
-  nav { gap: 13px; }
-  nav a { font-size: 11px; }
-  .nav-button { display: none; }
-  .logo { font-size: 17px; }
-  .hero { min-height: 570px; padding: 80px 7%; }
-  section { padding: 75px 7%; }
-  .intro { grid-template-columns: 1fr; gap: 30px; }
-  .service-grid, .principle-grid { grid-template-columns: 1fr; }
-  .hero-decoration { opacity: .4; }
-  footer { flex-direction: column; }
+    .filtros{
+      display:grid;
+      grid-template-columns:1.4fr 1fr 1fr;
+      gap:14px;
+      margin-bottom:30px;
+    }
+
+    .campo{
+      width:100%;
+      min-height:52px;
+      border:1px solid var(--borda);
+      border-radius:12px;
+      padding:0 16px;
+      background:var(--branco);
+      color:var(--preto);
+      outline:none;
+      transition:border-color var(--transicao);
+    }
+
+    .campo:focus{border-color:var(--preto)}
+
+    select.campo{appearance:none;background-image:linear-gradient(45deg,transparent 50%,var(--cinza-700) 50%),linear-gradient(135deg,var(--cinza-700) 50%,transparent 50%);background-position:calc(100% - 21px) 24px,calc(100% - 16px) 24px;background-size:5px 5px;background-repeat:no-repeat;padding-right:42px}
+
+    .paginas{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:20px;
+      margin-top:34px;
+      flex-wrap:wrap;
+    }
+
+    .paginas-botoes{display:flex;gap:8px}
+
+    .pagina-botao{
+      min-width:42px;
+      min-height:42px;
+      border:1px solid var(--borda);
+      border-radius:10px;
+      background:var(--branco);
+      color:var(--cinza-700);
+      cursor:pointer;
+      transition:all var(--transicao);
+    }
+
+    .pagina-botao:hover:not(:disabled){border-color:var(--preto);color:var(--preto)}
+
+    .pagina-botao.ativo{background:var(--preto);border-color:var(--preto);color:var(--branco)}
+
+    .pagina-botao:disabled{opacity:.35;cursor:not-allowed}
+
+    .produto-detalhe{
+      display:grid;
+      grid-template-columns:minmax(0,420px) 1fr;
+      gap:46px;
+      align-items:start;
+      padding:64px 0;
+    }
+
+    .detalhe-capa{
+      aspect-ratio:3/4;
+      overflow:hidden;
+      border:1px solid var(--borda);
+      border-radius:var(--raio);
+      background:var(--cinza-100);
+    }
+
+    .detalhe-capa img{width:100%;height:100%;object-fit:cover}
+
+    .detalhe-capa-vazia{
+      display:grid;
+      place-items:center;
+      height:100%;
+      color:var(--cinza-500);
+      font-size:.8rem;
+      letter-spacing:.1em;
+      text-transform:uppercase;
+    }
+
+    .detalhe-info h1{font-size:clamp(1.9rem,4vw,3rem);margin:12px 0 18px}
+
+    .detalhe-info p{color:var(--cinza-700);white-space:pre-line}
+
+    .preco-detalhe{
+      margin:26px 0 10px;
+      font-size:1.7rem;
+      font-weight:700;
+    }
+
+    .plataformas{
+      display:grid;
+      gap:10px;
+      margin-top:22px;
+    }
+
+    .plataforma{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:16px;
+      padding:16px 18px;
+      border:1px solid var(--borda);
+      border-radius:12px;
+      transition:border-color var(--transicao),background var(--transicao);
+    }
+
+    .plataforma:hover{border-color:var(--preto);background:var(--cinza-100)}
+
+    .plataforma-nome{font-weight:600}
+
+    .plataforma-descricao{display:block;font-size:.8rem;color:var(--cinza-500)}
+
+    .voltar{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      margin-bottom:22px;
+      font-size:.82rem;
+      font-weight:600;
+      letter-spacing:.08em;
+      text-transform:uppercase;
+      color:var(--cinza-700);
+    }
+
+    .voltar:hover{color:var(--preto)}
+
+    .beneficios{
+      display:grid;
+      grid-template-columns:repeat(3,1fr);
+      gap:22px;
+    }
+
+    .beneficio{
+      border:1px solid var(--borda);
+      border-radius:var(--raio);
+      padding:30px;
+      background:var(--branco);
+    }
+
+    .beneficio h3{margin:14px 0 8px}
+
+    .beneficio p{margin:0;color:var(--cinza-700);font-size:.94rem}
+
+    .beneficio-numero{
+      font-family:"Playfair Display",serif;
+      font-size:1.6rem;
+      font-weight:700;
+      color:var(--cinza-300);
+    }
+
+    .contato{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:44px;
+      align-items:center;
+    }
+
+    .contato-lista{
+      list-style:none;
+      margin:26px 0 0;
+      padding:0;
+      display:grid;
+      gap:14px;
+    }
+
+    .contato-lista li{
+      display:flex;
+      gap:12px;
+      color:var(--cinza-700);
+    }
+
+    .contato-lista strong{color:var(--preto);font-weight:600}
+
+    .rodape{
+      padding:54px 0 34px;
+      background:var(--preto);
+      color:rgba(255,255,255,.72);
+    }
+
+    .rodape-grade{
+      display:grid;
+      grid-template-columns:1.4fr 1fr 1fr;
+      gap:34px;
+    }
+
+    .rodape h3{
+      color:var(--branco);
+      font-family:"Inter",sans-serif;
+      font-size:.8rem;
+      font-weight:600;
+      letter-spacing:.14em;
+      text-transform:uppercase;
+      margin:0 0 16px;
+    }
+
+    .rodape p,
+    .rodape a{font-size:.9rem}
+
+    .rodape a:hover{color:var(--branco)}
+
+    .rodape-links{
+      list-style:none;
+      margin:0;
+      padding:0;
+      display:grid;
+      gap:10px;
+    }
+
+    .rodape-base{
+      display:flex;
+      justify-content:space-between;
+      gap:16px;
+      margin-top:44px;
+      padding-top:22px;
+      border-top:1px solid rgba(255,255,255,.14);
+      font-size:.78rem;
+    }
+
+    .aviso{
+      margin-top:22px;
+      padding:14px 16px;
+      border:1px solid var(--borda);
+      border-radius:10px;
+      background:var(--cinza-100);
+      color:var(--cinza-700);
+      font-size:.82rem;
+    }
+
+    .oculto{display:none !important}
+
+    .toast{
+      position:fixed;
+      left:50%;
+      bottom:24px;
+      z-index:100;
+      transform:translate(-50%,120%);
+      max-width:min(520px,calc(100% - 32px));
+      padding:14px 18px;
+      border-radius:12px;
+      background:var(--preto);
+      color:var(--branco);
+      font-size:.9rem;
+      opacity:0;
+      transition:transform .3s ease,opacity .3s ease;
+    }
+
+    .toast.visivel{
+      transform:translate(-50%,0);
+      opacity:1;
+    }
+
+    @media (max-width:920px){
+      .grade,
+      .beneficios{grid-template-columns:repeat(2,1fr)}
+
+      .produto-detalhe,
+      .contato{grid-template-columns:1fr}
+
+      .filtros{grid-template-columns:1fr}
+
+      .rodape-grade{grid-template-columns:1fr 1fr}
+
+      .secao-cabecalho{flex-direction:column;align-items:flex-start}
+    }
+
+    @media (max-width:720px){
+      .navegacao{
+        position:fixed;
+        inset:74px 0 auto 0;
+        flex-direction:column;
+        align-items:stretch;
+        gap:0;
+        padding:8px 20px 18px;
+        background:var(--branco);
+        border-bottom:1px solid var(--borda);
+        transform:translateY(-130%);
+        transition:transform .28s ease;
+      }
+
+      .navegacao.aberta{transform:translateY(0)}
+
+      .navegacao a{
+        padding:15px 0;
+        border-bottom:1px solid var(--cinza-100);
+      }
+
+      .menu-botao{display:block}
+
+      .hero{padding:58px 0 52px}
+
+      .secao{padding:54px 0}
+
+      .grade,
+      .beneficios{grid-template-columns:1fr}
+
+      .rodape-grade{grid-template-columns:1fr}
+
+      .rodape-base{flex-direction:column}
+    }
+  </style>
+</head>
+
+<body>
+  <header class="topo">
+    <div class="container topo-interno">
+      <a href="#/" class="marca" aria-label="ACCS CONSULTORIA — página inicial">
+        <span class="marca-sigla">ACCS</span>
+        <span>ACCS Consultoria</span>
+      </a>
+
+      <button class="menu-botao" id="menuBotao" aria-label="Abrir menu" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+
+      <nav class="navegacao" id="navegacao" aria-label="Navegação principal">
+        <a href="#/" data-rota="/">Início</a>
+        <a href="#/catalogo" data-rota="/catalogo">Catálogo</a>
+        <a href="#/#lancamentos">Lançamentos</a>
+        <a href="#/#contato">Contato</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="app">
+    <!-- A home é renderizada pelo JavaScript -->
+  </main>
+
+  <footer class="rodape">
+    <div class="container">
+      <div class="rodape-grade">
+        <div>
+          <div class="marca" style="color:#fff">
+            <span class="marca-sigla" style="border-color:#fff;color:#fff">ACCS</span>
+            <span>ACCS Consultoria</span>
+          </div>
+          <p style="margin-top:18px;max-width:420px">
+            Conteúdos digitais, materiais de estudo e cursos organizados para compra segura por plataformas de pagamento.
+          </p>
+        </div>
+
+        <div>
+          <h3>Navegação</h3>
+          <ul class="rodape-links">
+            <li><a href="#/">Página inicial</a></li>
+            <li><a href="#/catalogo">Catálogo</a></li>
+            <li><a href="#/#lancamentos">Lançamentos</a></li>
+            <li><a href="#/#contato">Contato</a></li>
+          </ul>
+        </div>
+
+        <div>
+          <h3>Contato</h3>
+          <!-- Edite os dados institucionais abaixo -->
+          <ul class="rodape-links">
+            <li><a href="mailto:contato@accsconsultoria.com.br">contato@accsconsultoria.com.br</a></li>
+            <li><a href="https://wa.me/5561999999999" target="_blank" rel="noopener">WhatsApp</a></li>
+            <li>Brasília — Distrito Federal, Brasil</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="rodape-base">
+        <span>© <span id="anoAtual"></span> ACCS CONSULTORIA. Todos os direitos reservados.</span>
+        <span>Site estático hospedado no GitHub Pages.</span>
+      </div>
+    </div>
+  </footer>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script>
+    /* =========================================================
+       CONFIGURAÇÃO DA LOJA
+       Edite apenas os campos entre aspas.
+       ========================================================= */
+    const CONFIGURACAO = {
+      nome: "ACCS CONSULTORIA",
+      descricaoCurta: "Conteúdos digitais selecionados para aprendizado, prática e desenvolvimento profissional.",
+      email: "contato@accsconsultoria.com.br",
+      whatsapp: "https://wa.me/5561999999999",
+      instagram: "https://instagram.com/accsconsultoria",
+
+      /*
+        Categorias editáveis.
+        O valor de "id" deve ser único, sem espaços ou acentos.
+      */
+      categorias: [
+        { id: "ebooks", nome: "E-books" },
+        { id: "livros-digitais", nome: "Livros digitais" },
+        { id: "pdfs", nome: "PDFs" },
+        { id: "apostilas", nome: "Apostilas" },
+        { id: "cursos", nome: "Cursos" }
+      ]
+    };
+
+    /* =========================================================
+       CATÁLOGO DE PRODUTOS
+       O catálogo começa vazio para você cadastrar seus produtos.
+
+       Campos:
+       - slug: identificador único, sem espaços ou acentos.
+       - nome: título exibido na loja.
+       - categoria: use um dos ids cadastrados em CONFIGURACAO.categorias.
+       - preco: texto livre, por exemplo "R$ 49,90".
+       - descricaoCurta: texto exibido no catálogo.
+       - descricaoCompleta: texto exibido na página do produto.
+       - capa: URL da imagem. Use "" para exibir um espaço reservado.
+       - destaque: true para aparecer em "Destaques".
+       - lancamento: true para aparecer em "Lançamentos".
+       - hotmart: cole aqui o link de checkout da Hotmart ou deixe "".
+       - kiwify: cole aqui o link de checkout da Kiwify ou deixe "".
+       ========================================================= */
+    const PRODUTOS = [
+      /*
+      {
+        slug: "exemplo-produto",
+        nome: "Nome do produto",
+        categoria: "ebooks",
+        preco: "R$ 00,00",
+        descricaoCurta: "Descrição curta exibida no catálogo.",
+        descricaoCompleta: "Descrição completa do produto, incluindo formato, conteúdo, público-alvo e entrega.",
+        capa: "https://exemplo.com/capa.jpg",
+        destaque: false,
+        lancamento: false,
+        hotmart: "",
+        kiwify: ""
+      }
+      */
+    ];
+
+    /* =========================================================
+       UTILIDADES
+       ========================================================= */
+    const app = document.getElementById("app");
+    const navegacao = document.getElementById("navegacao");
+    const menuBotao = document.getElementById("menuBotao");
+    const toast = document.getElementById("toast");
+
+    const escaparHTML = (texto = "") =>
+      String(texto)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+
+    const categoriaPorId = (id) =>
+      CONFIGURACAO.categorias.find((categoria) => categoria.id === id)?.nome || "Categoria";
+
+    const obterRota = () => {
+      const hash = window.location.hash.replace(/^#/, "");
+      return hash || "/";
+    };
+
+    const mostrarToast = (mensagem) => {
+      toast.textContent = mensagem;
+      toast.classList.add("visivel");
+      setTimeout(() => toast.classList.remove("visivel"), 3200);
+    };
+
+    const capaProduto = (produto, classe = "produto-capa") => {
+      const capa = produto.capa
+        ? `<img src="${escaparHTML(produto.capa)}" alt="Capa do produto ${escaparHTML(produto.nome)}" loading="lazy">`
+        : `<div class="produto-capa-vazia">Capa não cadastrada</div>`;
+
+      const etiquetas = [];
+      if (produto.destaque) etiquetas.push('<span class="etiqueta etiqueta-destaque">Destaque</span>');
+      if (produto.lancamento) etiquetas.push('<span class="etiqueta etiqueta-lancamento">Lançamento</span>');
+
+      return `
+        <div class="${classe}">
+          ${capa}
+          ${etiquetas.length ? `<div class="etiquetas">${etiquetas.join("")}</div>` : ""}
+        </div>
+      `;
+    };
+
+    const plataformasCompra = (produto) => {
+      const plataformas = [];
+
+      if (produto.hotmart) {
+        plataformas.push(`
+          <a class="plataforma" href="${escaparHTML(produto.hotmart)}" target="_blank" rel="noopener">
+            <span>
+              <span class="plataforma-nome">Comprar na Hotmart</span>
+              <span class="plataforma-descricao">Checkout seguro da plataforma</span>
+            </span>
+            <span aria-hidden="true">→</span>
+          </a>
+        `);
+      }
+
+      if (produto.kiwify) {
+        plataformas.push(`
+          <a class="plataforma" href="${escaparHTML(produto.kiwify)}" target="_blank" rel="noopener">
+            <span>
+              <span class="plataforma-nome">Comprar na Kiwify</span>
+              <span class="plataforma-descricao">Checkout seguro da plataforma</span>
+            </span>
+            <span aria-hidden="true">→</span>
+          </a>
+        `);
+      }
+
+      return plataformas.length
+        ? `<div class="plataformas">${plataformas.join("")}</div>`
+        : `<div class="aviso">Nenhum link de compra foi cadastrado para este produto.</div>`;
+    };
+
+    const cartaoProduto = (produto) => `
+      <article class="produto">
+        <a href="#/produto/${escaparHTML(produto.slug)}" aria-label="Ver produto ${escaparHTML(produto.nome)}">
+          ${capaProduto(produto)}
+        </a>
+        <div class="produto-info">
+          <span class="produto-categoria">${escaparHTML(categoriaPorId(produto.categoria))}</span>
+          <a href="#/produto/${escaparHTML(produto.slug)}">
+            <h3 class="produto-nome">${escaparHTML(produto.nome)}</h3>
+          </a>
+          <p class="produto-descricao">${escaparHTML(produto.descricaoCurta)}</p>
+          <div class="produto-preco">
+            ${escaparHTML(produto.preco)}
+            <span>Produto digital</span>
+          </div>
+          <a class="botao botao-comprar" href="#/produto/${escaparHTML(produto.slug)}">Ver produto</a>
+        </div>
+      </article>
+    `;
+
+    const gradeProdutos = (produtos, mensagemVazia) =>
+      produtos.length
+        ? `<div class="grade">${produtos.map(cartaoProduto).join("")}</div>`
+        : `<div class="vazio">${escaparHTML(mensagemVazia)}</div>`;
+
+    /* =========================================================
+       PÁGINAS
+       ========================================================= */
+    const paginaInicial = () => {
+      const destaques = PRODUTOS.filter((produto) => produto.destaque).slice(0, 3);
+      const lancamentos = PRODUTOS.filter((produto) => produto.lancamento).slice(0, 3);
+
+      return `
+        <section class="hero">
+          <div class="container hero-conteudo">
+            <span class="selo">Loja digital</span>
+            <h1>Conteúdos digitais da ACCS CONSULTORIA</h1>
+            <p>${escaparHTML(CONFIGURACAO.descricaoCurta)}</p>
+            <div class="acoes">
+              <a class="botao" href="#/catalogo">Explorar catálogo</a>
+              <a class="botao botao-claro" href="#/#contato">Falar com a ACCS</a>
+            </div>
+          </div>
+        </section>
+
+        <section class="secao" id="destaques">
+          <div class="container">
+            <div class="secao-cabecalho">
+              <div>
+                <h2>Produtos em destaque</h2>
+                <p>Selecione os produtos que deseja destacar definindo <strong>destaque: true</strong> no cadastro.</p>
+              </div>
+              <a class="botao botao-claro" href="#/catalogo">Ver todos</a>
+            </div>
+            ${gradeProdutos(destaques, "Nenhum produto foi marcado como destaque. Cadastre produtos e defina <strong>destaque: true</strong>.")}
+          </div>
+        </section>
+
+        <section class="secao" id="lancamentos">
+          <div class="container">
+            <div class="secao-cabecalho">
+              <div>
+                <h2>Lançamentos</h2>
+                <p>Marque novos materiais com <strong>lancamento: true</strong> para exibi-los nesta seção.</p>
+              </div>
+              <a class="botao botao-claro" href="#/catalogo">Explorar</a>
+            </div>
+            ${gradeProdutos(lancamentos, "Nenhum lançamento cadastrado. Cadastre produtos e defina <strong>lancamento: true</strong>.")}
+          </div>
+        </section>
+
+        <section class="secao">
+          <div class="container">
+            <div class="secao-cabecalho">
+              <div>
+                <h2>Como funciona</h2>
+                <p>Escolha o material, finalize a compra na plataforma de pagamento e receba o acesso conforme a configuração do produto.</p>
+              </div>
+            </div>
+
+            <div class="beneficios">
+              <article class="beneficio">
+                <span class="beneficio-numero">01</span>
+                <h3>Escolha o material</h3>
+                <p> navegue pelo catálogo, use a pesquisa e os filtros para localizar e-books, PDFs, apostilas ou cursos.</p>
+              </article>
+
+              <article class="beneficio">
+                <span class="beneficio-numero">02</span>
+                <h3>Finalize a compra</h3>
+                <p>Os botões de compra direcionam para os checkouts cadastrados nas plataformas Hotmart ou Kiwify.</p>
+              </article>
+
+              <article class="beneficio">
+                <span class="beneficio-numero">03</span>
+                <h3>Acesse o conteúdo</h3>
+                <p>O acesso, entrega e suporte seguem as condições definidas em cada página de produto e plataforma de pagamento.</p>
+              </article>
+            </div>
+          </div>
+        </section>
+
+        <section class="secao" id="contato">
+          <div class="container contato">
+            <div>
+              <h2>Fale com a ACCS CONSULTORIA</h2>
+              <p>Dúvidas sobre produtos digitais, acesso, materiais ou parcerias podem ser enviadas pelos canais abaixo.</p>
+              <ul class="contato-lista">
+                <li><strong>E-mail:</strong> <a href="mailto:${escaparHTML(CONFIGURACAO.email)}">${escaparHTML(CONFIGURACAO.email)}</a></li>
+                <li><strong>WhatsApp:</strong> <a href="${escaparHTML(CONFIGURACAO.whatsapp)}" target="_blank" rel="noopener">Abrir conversa</a></li>
+                <li><strong>Instagram:</strong> <a href="${escaparHTML(CONFIGURACAO.instagram)}" target="_blank" rel="noopener">@accsconsultoria</a></li>
+              </ul>
+            </div>
+
+            <div class="beneficio">
+              <h3>Atendimento</h3>
+              <p>O atendimento é realizado pelos canais institucionais informados nesta página. Para questões de pagamento, entrega ou reembolso, consulte também as condições da plataforma utilizada na compra.</p>
+              <a class="botao" href="${escaparHTML(CONFIGURACAO.whatsapp)}" target="_blank" rel="noopener">Enviar mensagem</a>
+            </div>
+          </div>
+        </section>
+      `;
+    };
+
+    const paginaCatalogo = (parametros) => {
+      const busca = (parametros.get("busca") || "").trim().toLowerCase();
+      const categoria = parametros.get("categoria") || "";
+      const ordem = parametros.get("ordem") || "recentes";
+      const paginaAtual = Math.max(1, parseInt(parametros.get("pagina") || "1", 10) || 1);
+      const porPagina = 9;
+
+      let produtos = [...PRODUTOS];
+
+      if (busca) {
+        produtos = produtos.filter((produto) =>
+          [produto.nome, produto.descricaoCurta, categoriaPorId(produto.categoria)]
+            .join(" ")
+            .toLowerCase()
+            .includes(busca)
+        );
+      }
+
+      if (categoria) {
+        produtos = produtos.filter((produto) => produto.categoria === categoria);
+      }
+
+      if (ordem === "az") {
+        produtos.sort((a, b) => a.nome.localeCompare(b.nome, "pt-BR"));
+      } else if (ordem === "za") {
+        produtos.sort((a, b) => b.nome.localeCompare(a.nome, "pt-BR"));
+      } else if (ordem === "destaques") {
+        produtos.sort((a, b) => Number(b.destaque) - Number(a.destaque));
+      } else if (ordem === "lancamentos") {
+        produtos.sort((a, b) => Number(b.lancamento) - Number(a.lancamento));
+      }
+
+      const totalPaginas = Math.max(1, Math.ceil(produtos.length / porPagina));
+      const pagina = Math.min(paginaAtual, totalPaginas);
+      const inicio = (pagina - 1) * porPagina;
+      const produtosPaginados = produtos.slice(inicio, inicio + porPagina);
+
+      const opcoesCategorias = CONFIGURACAO.categorias
+        .map(
+          (item) =>
+            `<option value="${escaparHTML(item.id)}" ${categoria === item.id ? "selected" : ""}>
+              ${escaparHTML(item.nome)}
+            </option>`
+        )
+        .join("");
+
+      const criarLinkFiltro = (novos) => {
+        const parametrosNovos = new URLSearchParams(parametros);
+        Object.entries(novos).forEach(([chave, valor]) => {
+          if (valor) parametrosNovos.set(chave, valor);
+          else parametrosNovos.delete(chave);
+        });
+        parametrosNovos.delete("pagina");
+        return `#/catalogo${parametrosNovos.toString() ? `?${parametrosNovos.toString()}` : ""}`;
+      };
+
+      const botoesPaginacao = [];
+      for (let numero = 1; numero <= totalPaginas; numero += 1) {
+        const parametrosPagina = new URLSearchParams(parametros);
+        parametrosPagina.set("pagina", String(numero));
+        botoesPaginacao.push(`
+          <button
+            class="pagina-botao ${numero === pagina ? "ativo" : ""}"
+            data-pagina="${numero}"
+            aria-label="Ir para a página ${numero}"
+          >${numero}</button>
+        `);
+      }
+
+      return `
+        <section class="secao">
+          <div class="container">
+            <div class="secao-cabecalho">
+              <div>
+                <h2>Catálogo digital</h2>
+                <p>Pesquise, filtre por categoria e organize os resultados para encontrar o material ideal.</p>
+              </div>
+            </div>
+
+            <form class="filtros" id="formFiltros">
+              <input
+                class="campo"
+                type="search"
+                name="busca"
+                placeholder="Buscar por nome, tema ou descrição"
+                value="${escaparHTML(parametros.get("busca") || "")}"
+                aria-label="Buscar produtos"
+              >
+
+              <select class="campo" name="categoria" aria-label="Filtrar por categoria">
+                <option value="">Todas as categorias</option>
+                ${opcoesCategorias}
+              </select>
+
+              <select class="campo" name="ordem" aria-label="Ordenar produtos">
+                <option value="recentes" ${ordem === "recentes" ? "selected" : ""}>Mais recentes</option>
+                <option value="az" ${ordem === "az" ? "selected" : ""}>Nome: A a Z</option>
+                <option value="za" ${ordem === "za" ? "selected" : ""}>Nome: Z a A</option>
+                <option value="destaques" ${ordem === "destaques" ? "selected" : ""}>Destaques primeiro</option>
+                <option value="lancamentos" ${ordem === "lancamentos" ? "selected" : ""}>Lançamentos primeiro</option>
+              </select>
+            </form>
+
+            <p style="margin:0 0 22px;color:var(--cinza-500);font-size:.9rem">
+              ${produtos.length} produto(s) encontrado(s)
+              ${busca ? `para “${escaparHTML(parametros.get("busca"))}”` : ""}
+              ${categoria ? `na categoria ${escaparHTML(categoriaPorId(categoria))}` : ""}.
+            </p>
+
+            ${gradeProdutos(produtosPaginados, "Nenhum produto corresponde aos filtros selecionados. O catálogo está pronto para receber seus cadastros.")}
+
+            ${
+              totalPaginas > 1
+                ? `
+                <div class="paginas">
+                  <span>Página ${pagina} de ${totalPaginas}</span>
+                  <div class="paginas-botoes">
+                    <button class="pagina-botao" data-pagina="${Math.max(1, pagina - 1)}" ${pagina === 1 ? "disabled" : ""} aria-label="Página anterior">←</button>
+                    ${botoesPaginacao.join("")}
+                    <button class="pagina-botao" data-pagina="${Math.min(totalPaginas, pagina + 1)}" ${pagina === totalPaginas ? "disabled" : ""} aria-label="Próxima página">→</button>
+                  </div>
+                </div>
+              `
+                : ""
+            }
+
+            <div class="aviso">
+              Área de cadastro: adicione novos produtos no array <strong>PRODUTOS</strong>, dentro da tag <strong>&lt;script&gt;</strong> deste arquivo. Os links de Hotmart e Kiwify são opcionais; apenas as plataformas com link cadastrado serão exibidas.
+            </div>
+          </div>
+        </section>
+      `;
+    };
+
+    const paginaProduto = (slug) => {
+      const produto = PRODUTOS.find((item) => item.slug === slug);
+
+      if (!produto) {
+        return `
+          <section class="secao">
+            <div class="container">
+              <a class="voltar" href="#/catalogo">← Voltar ao catálogo</a>
+              <div class="vazio">
+                <h2 style="margin-bottom:10px">Produto não encontrado</h2>
+                <p>O produto solicitado não está cadastrado ou o link foi alterado.</p>
+                <a class="botao" href="#/catalogo">Ver  footer { flex-direction: column; }
 }
 </style>
 </head>
