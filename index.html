@@ -40,13 +40,20 @@
       --raio:14px;
       --sombra:0 10px 30px rgba(15,15,15,.06);
       --transicao:.22s ease;
+      --fundo-base:#f7f7f7;
+      --fundo-padrao:radial-gradient(rgba(15,15,15,.07) 1px, transparent 1px);
     }
 
     *{box-sizing:border-box}
     html{scroll-behavior:smooth}
     body{
       margin:0;
-      background:var(--branco);
+      background:
+        radial-gradient(ellipse at 15% 0%, rgba(15,15,15,.05) 0%, transparent 55%),
+        var(--fundo-padrao) 0 0 / 22px 22px,
+        var(--fundo-base);
+      background-attachment:fixed;
+      min-height:100vh;
       color:var(--cinza-900);
       font-family:"Inter",system-ui,-apple-system,BlinkMacSystemFont,sans-serif;
       font-size:16px;
