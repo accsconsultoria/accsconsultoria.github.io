@@ -673,6 +673,25 @@
 
       .rodape-base{flex-direction:column}
     }
+    /* ===== Publicações, prévia e visualizador ===== */
+    .detalhe-meta{color:var(--cinza-500);font-size:.92rem;margin:-6px 0 18px}
+    .botao-pendente{opacity:.45;cursor:not-allowed;pointer-events:none}
+    .previa-cabecalho{display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:18px;margin:10px 0 24px}
+    .previa-cabecalho h2{margin:8px 0 0}
+    .visualizador{border:1px solid var(--borda);border-radius:var(--raio);background:var(--cinza-100);box-shadow:var(--sombra)}
+    .visualizador-barra{display:flex;align-items:center;flex-wrap:wrap;gap:8px;padding:12px 14px;background:var(--branco);border-bottom:1px solid var(--borda);border-radius:var(--raio) var(--raio) 0 0}
+    .visualizador-barra .botao{padding:9px 14px}
+    .visualizador-barra > span{min-width:64px;text-align:center;font-size:.9rem;color:var(--cinza-700)}
+    .visualizador-separador{flex:1 1 auto}
+    .visualizador-area{display:flex;justify-content:center;align-items:flex-start;min-height:360px;overflow:auto;padding:20px 12px}
+    .visualizador-area canvas{display:block;background:var(--branco);box-shadow:0 6px 22px rgba(15,15,15,.12);max-width:none}
+    .visualizador-estado{margin:auto;text-align:center;color:var(--cinza-500);padding:40px 16px}
+    .visualizador-estado p{margin:0 0 14px}
+    @media (max-width:640px){
+      .visualizador-barra{gap:6px;padding:10px}
+      .visualizador-barra .botao{padding:8px 11px}
+      .visualizador-separador{display:none}
+    }
   </style>
 </head>
 
@@ -729,7 +748,7 @@
           <!-- Edite os dados institucionais abaixo -->
           <ul class="rodape-links">
             <li><a href="mailto:contato@accsconsultoria.com.br">contato@accsconsultoria.com.br</a></li>
-            <li><a href="https://wa.me/5561999999999" target="_blank" rel="noopener">WhatsApp</a></li>
+            <li><a id="whatsappRodape" href="#/#contato">WhatsApp</a></li>
             <li>Brasília — Distrito Federal, Brasil</li>
           </ul>
         </div>
@@ -753,7 +772,7 @@
       nome: "ACCS CONSULTORIA",
       descricaoCurta: "Conteúdos digitais selecionados para aprendizado, prática e desenvolvimento profissional.",
       email: "contato@accsconsultoria.com.br",
-      whatsapp: "https://wa.me/5561999999999",
+      whatsapp: "", // Pendente: cole o número oficial no formato https://wa.me/55DDDNUMERO (somente dígitos).
       instagram: "https://instagram.com/accsconsultoria",
 
       /*
@@ -770,39 +789,78 @@
     };
 
     /* =========================================================
-       CATÁLOGO DE PRODUTOS
-       O catálogo começa vazio para você cadastrar seus produtos.
+       CATÁLOGO DE PUBLICAÇÕES
+       As publicações ficam em data/publicacoes.json. Para cadastrar
+       uma nova publicação, acrescente um objeto ao array "publicacoes"
+       desse arquivo; não é preciso alterar este script.
 
        Campos:
        - slug: identificador único, sem espaços ou acentos.
-       - nome: título exibido na loja.
-       - categoria: use um dos ids cadastrados em CONFIGURACAO.categorias.
-       - preco: texto livre, por exemplo "R$ 49,90".
+       - nome, autor, formato, preco: textos exibidos na loja.
+       - categoria: um dos ids de CONFIGURACAO.categorias.
        - descricaoCurta: texto exibido no catálogo.
-       - descricaoCompleta: texto exibido na página do produto.
-       - capa: URL da imagem. Use "" para exibir um espaço reservado.
-       - destaque: true para aparecer em "Destaques".
-       - lancamento: true para aparecer em "Lançamentos".
-       - hotmart: cole aqui o link de checkout da Hotmart ou deixe "".
-       - kiwify: cole aqui o link de checkout da Kiwify ou deixe "".
+       - descricaoCompleta: texto exibido na página da publicação.
+       - capa: caminho da imagem, por exemplo "assets/capas/nome.jpg".
+       - previa: PDF de prévia autorizado, por exemplo "previews/nome.pdf".
+         Somente arquivos dentro da pasta previews/ são aceitos.
+       - destaque, lancamento: true ou false.
+       - hotmart, kiwify: opcionais.
        ========================================================= */
-    const PRODUTOS = [
-      /*
-      {
-        slug: "exemplo-produto",
-        nome: "Nome do produto",
-        categoria: "ebooks",
-        preco: "R$ 00,00",
-        descricaoCurta: "Descrição curta exibida no catálogo.",
-        descricaoCompleta: "Descrição completa do produto, incluindo formato, conteúdo, público-alvo e entrega.",
-        capa: "https://exemplo.com/capa.jpg",
-        destaque: false,
-        lancamento: false,
-        hotmart: "",
-        kiwify: ""
+    const CAMINHO_CATALOGO = "data/publicacoes.json";
+    let PRODUTOS = [];
+    let catalogoPronto = false;
+    let erroCatalogo = false;
+
+    const normalizarPublicacao = (item) => {
+      const previa = String(item.previa || "").trim();
+      return {
+        slug: String(item.slug || "").trim(),
+        nome: String(item.nome || "").trim(),
+        categoria: String(item.categoria || "").trim(),
+        autor: String(item.autor || "").trim(),
+        formato: String(item.formato || "").trim(),
+        preco: String(item.preco || "").trim(),
+        descricaoCurta: String(item.descricaoCurta || "").trim(),
+        descricaoCompleta: String(item.descricaoCompleta || "").trim(),
+        capa: String(item.capa || "").trim(),
+        previa: /^previews\/[\w.-]+\.pdf$/i.test(previa) ? previa : "",
+        destaque: item.destaque === true,
+        lancamento: item.lancamento === true,
+        hotmart: String(item.hotmart || "").trim(),
+        kiwify: String(item.kiwify || "").trim()
+      };
+    };
+
+    const carregarPublicacoes = async () => {
+      try {
+        const resposta = await fetch(CAMINHO_CATALOGO, { cache: "no-cache" });
+        if (!resposta.ok) throw new Error(`HTTP ${resposta.status}`);
+
+        const dados = await resposta.json();
+        if (!Array.isArray(dados?.publicacoes)) {
+          throw new Error("Estrutura inválida em publicacoes.json");
+        }
+
+        const slugs = new Set();
+        PRODUTOS = dados.publicacoes
+          .filter((item) => item && typeof item === "object")
+          .map(normalizarPublicacao)
+          .filter((item) => {
+            if (!item.slug || !item.nome) return false;
+            if (slugs.has(item.slug)) {
+              console.warn(`Slug duplicado ignorado: ${item.slug}`);
+              return false;
+            }
+            slugs.add(item.slug);
+            return true;
+          });
+        erroCatalogo = false;
+      } catch (erro) {
+        console.warn("Não foi possível carregar o catálogo:", erro);
+        PRODUTOS = [];
+        erroCatalogo = true;
       }
-      */
-    ];
+    };
 
     /* =========================================================
        UTILIDADES
@@ -824,8 +882,51 @@
       CONFIGURACAO.categorias.find((categoria) => categoria.id === id)?.nome || "Categoria";
 
     const obterRota = () => {
-      const hash = window.location.hash.replace(/^#/, "");
-      return hash || "/";
+      const bruto = window.location.hash.replace(/^#/, "");
+      const [semAncora, ancora = ""] = bruto.split("#");
+      const [caminho = "", query = ""] = semAncora.split("?");
+      return {
+        caminho: caminho || "/",
+        parametros: new URLSearchParams(query),
+        ancora
+      };
+    };
+
+    const decodificar = (texto) => {
+      try {
+        return decodeURIComponent(texto);
+      } catch {
+        return texto;
+      }
+    };
+
+    /* =========================================================
+       WHATSAPP
+       Número pendente: enquanto CONFIGURACAO.whatsapp estiver vazio,
+       os botões aparecem como "Atendimento em breve".
+       ========================================================= */
+    const linkWhatsapp = (mensagem = "") => {
+      if (!/^https:\/\/wa\.me\/\d{10,15}$/.test(CONFIGURACAO.whatsapp)) return "";
+      return mensagem
+        ? `${CONFIGURACAO.whatsapp}?text=${encodeURIComponent(mensagem)}`
+        : CONFIGURACAO.whatsapp;
+    };
+
+    const mensagemCompra = (produto) =>
+      `Olá! Tenho interesse na publicação "${produto.nome}" da ACCS CONSULTORIA. Poderia me passar as informações para a compra?`;
+
+    const botaoWhatsapp = (mensagem, rotulo, classe = "botao") => {
+      const url = linkWhatsapp(mensagem);
+      return url
+        ? `<a class="${classe}" href="${escaparHTML(url)}" target="_blank" rel="noopener">${escaparHTML(rotulo)}</a>`
+        : `<span class="${classe} botao-pendente" aria-disabled="true">Atendimento em breve</span>`;
+    };
+
+    const linkWhatsappTexto = (rotulo) => {
+      const url = linkWhatsapp();
+      return url
+        ? `<a href="${escaparHTML(url)}" target="_blank" rel="noopener">${escaparHTML(rotulo)}</a>`
+        : `<span>Em breve</span>`;
     };
 
     const mostrarToast = (mensagem) => {
@@ -899,6 +1000,7 @@
             <span>Produto digital</span>
           </div>
           <a class="botao botao-comprar" href="#/produto/${escaparHTML(produto.slug)}">Ver produto</a>
+          ${produto.previa ? `<a class="botao botao-claro" href="#/previa/${escaparHTML(produto.slug)}">Ver prévia</a>` : ""}
         </div>
       </article>
     `;
@@ -973,7 +1075,7 @@
               <article class="beneficio">
                 <span class="beneficio-numero">02</span>
                 <h3>Finalize a compra</h3>
-                <p>Os botões de compra direcionam para os checkouts cadastrados nas plataformas Hotmart ou Kiwify.</p>
+                <p>Os botões de compra direcionam para o atendimento individual pelo WhatsApp, onde você recebe as condições da publicação.</p>
               </article>
 
               <article class="beneficio">
@@ -992,7 +1094,7 @@
               <p>Dúvidas sobre produtos digitais, acesso, materiais ou parcerias podem ser enviadas pelos canais abaixo.</p>
               <ul class="contato-lista">
                 <li><strong>E-mail:</strong> <a href="mailto:${escaparHTML(CONFIGURACAO.email)}">${escaparHTML(CONFIGURACAO.email)}</a></li>
-                <li><strong>WhatsApp:</strong> <a href="${escaparHTML(CONFIGURACAO.whatsapp)}" target="_blank" rel="noopener">Abrir conversa</a></li>
+                <li><strong>WhatsApp:</strong> ${linkWhatsappTexto("Abrir conversa")}</li>
                 <li><strong>Instagram:</strong> <a href="${escaparHTML(CONFIGURACAO.instagram)}" target="_blank" rel="noopener">@accsconsultoria</a></li>
               </ul>
             </div>
@@ -1000,7 +1102,7 @@
             <div class="beneficio">
               <h3>Atendimento</h3>
               <p>O atendimento é realizado pelos canais institucionais informados nesta página. Para questões de pagamento, entrega ou reembolso, consulte também as condições da plataforma utilizada na compra.</p>
-              <a class="botao" href="${escaparHTML(CONFIGURACAO.whatsapp)}" target="_blank" rel="noopener">Enviar mensagem</a>
+              ${botaoWhatsapp("", "Enviar mensagem")}
             </div>
           </div>
         </section>
@@ -1116,7 +1218,7 @@
               ${categoria ? `na categoria ${escaparHTML(categoriaPorId(categoria))}` : ""}.
             </p>
 
-            ${gradeProdutos(produtosPaginados, "Nenhum produto corresponde aos filtros selecionados. O catálogo está pronto para receber seus cadastros.")}
+            ${gradeProdutos(produtosPaginados, erroCatalogo ? "Não foi possível carregar o catálogo no momento. Tente novamente em instantes." : "Nenhum produto corresponde aos filtros selecionados.")}
 
             ${
               totalPaginas > 1
@@ -1134,13 +1236,16 @@
             }
 
             <div class="aviso">
-              Área de cadastro: adicione novos produtos no array <strong>PRODUTOS</strong>, dentro da tag <strong>&lt;script&gt;</strong> deste arquivo. Os links de Hotmart e Kiwify são opcionais; apenas as plataformas com link cadastrado serão exibidas.
+              Área de cadastro: as publicações são cadastradas em <strong>data/publicacoes.json</strong>, sem alterar este script. Os links de Hotmart e Kiwify são opcionais.
             </div>
           </div>
         </section>
       `;
     };
 
+    /* =========================================================
+       PÁGINAS DE PUBLICAÇÃO
+       ========================================================= */
     const paginaProduto = (slug) => {
       const produto = PRODUTOS.find((item) => item.slug === slug);
 
@@ -1152,130 +1257,426 @@
               <div class="vazio">
                 <h2 style="margin-bottom:10px">Produto não encontrado</h2>
                 <p>O produto solicitado não está cadastrado ou o link foi alterado.</p>
-                <a class="botao" href="#/catalogo">Ver  footer { flex-direction: column; }
-}
-</style>
-</head>
+                <a class="botao" href="#/catalogo">Ver catálogo</a>
+              </div>
+            </div>
+          </section>
+        `;
+      }
 
-<body>
+      const previa = produto.previa
+        ? `<a class="botao botao-claro" href="#/previa/${escaparHTML(produto.slug)}">Ver prévia</a>`
+        : "";
 
-<header>
-  <a href="#" class="logo">ACCS<span>.</span> CONSULTORIA</a>
-  <nav>
-    <a href="#inicio">Início</a>
-    <a href="#sobre">Institucional</a>
-    <a href="#atuacao">Atuação</a>
-    <a href="#contato">Contato</a>
-  </nav>
-</header>
+      const detalhes = [
+        produto.autor ? `Autoria: ${escaparHTML(produto.autor)}` : "",
+        produto.formato ? escaparHTML(produto.formato) : ""
+      ].filter(Boolean);
 
-<main>
-<section class="hero" id="inicio">
-  <div class="hero-content">
-    <div class="eyebrow">ACCS CONSULTORIA</div>
-    <h1>Inteligência para decidir.<br><span>Estratégia para transformar.</span></h1>
-    <p>
-      Conhecimento, visão estratégica e capacidade analítica
-      para compreender desafios e construir soluções.
-    </p>
-    <a class="hero-link" href="#sobre">CONHEÇA A ACCS &nbsp; →</a>
-  </div>
-  <div class="hero-decoration"></div>
-</section>
+      return `
+        <section class="secao">
+          <div class="container">
+            <a class="voltar" href="#/catalogo">← Voltar ao catálogo</a>
 
-<section id="sobre">
-  <div class="intro">
-    <div>
-      <div class="section-label">01 — INSTITUCIONAL</div>
-      <h2>Conhecimento aplicado a desafios reais.</h2>
-    </div>
-    <div>
-      <p class="intro-text">
-        A ACCS Consultoria apresenta uma abordagem orientada
-        por conhecimento técnico, análise crítica e visão
-        estratégica. Nosso compromisso é contribuir para
-        decisões mais consistentes e soluções fundamentadas.
-      </p>
-      <div class="intro-mark">
-        Estratégia, conhecimento e método como fundamentos
-        para a construção de resultados.
-      </div>
-    </div>
-  </div>
-</section>
+            <div class="produto-detalhe">
+              <div class="detalhe-capa">
+                ${
+                  produto.capa
+                    ? `<img src="${escaparHTML(produto.capa)}" alt="Capa de ${escaparHTML(produto.nome)}">`
+                    : `<div class="detalhe-capa-vazia">Capa não cadastrada</div>`
+                }
+              </div>
 
-<section class="services" id="atuacao">
-  <div class="services-header">
-    <div class="section-label">02 — ATUAÇÃO</div>
-    <h2>Frentes de conhecimento e soluções.</h2>
-  </div>
+              <div class="detalhe-info">
+                <span class="produto-categoria">${escaparHTML(categoriaPorId(produto.categoria))}</span>
+                <h1>${escaparHTML(produto.nome)}</h1>
+                ${detalhes.length ? `<p class="detalhe-meta">${detalhes.join(" · ")}</p>` : ""}
+                <p>${escaparHTML(produto.descricaoCompleta || produto.descricaoCurta)}</p>
 
-  <div class="service-grid">
-    <article class="service-card">
-      <div class="service-number">01 /</div>
-      <h3>Planejamento e Gestão</h3>
-      <p>
-        Abordagens estratégicas para organização,
-        planejamento e aprimoramento da gestão.
-      </p>
-    </article>
+                <div class="produto-preco">
+                  ${produto.preco ? escaparHTML(produto.preco) : ""}
+                  <span>Produto digital</span>
+                </div>
 
-    <article class="service-card">
-      <div class="service-number">02 /</div>
-      <h3>Estudos e Análises</h3>
-      <p>
-        Produção de conhecimento, estudos técnicos
-        e análises orientadas por evidências.
-      </p>
-    </article>
+                <div class="acoes">
+                  ${previa}
+                  ${botaoWhatsapp(mensagemCompra(produto), "Comprar pelo WhatsApp")}
+                </div>
 
-    <article class="service-card">
-      <div class="service-number">03 /</div>
-      <h3>Projetos e Soluções</h3>
-      <p>
-        Estruturação de projetos e desenvolvimento
-        de soluções para diferentes desafios.
-      </p>
-    </article>
-  </div>
-</section>
+                ${produto.hotmart || produto.kiwify ? plataformasCompra(produto) : ""}
+              </div>
+            </div>
+          </div>
+        </section>
+      `;
+    };
 
-<section class="principles">
-  <div class="section-label">03 — COMPROMISSOS</div>
-  <h2>Uma abordagem baseada em fundamentos sólidos.</h2>
+    const paginaPrevia = (slug) => {
+      const produto = PRODUTOS.find((item) => item.slug === slug);
+      if (!produto) return paginaProduto(slug);
 
-  <div class="principle-grid">
-    <article class="principle">
-      <h3>Conhecimento</h3>
-      <p>Fundamentação técnica e valorização do conhecimento.</p>
-    </article>
-    <article class="principle">
-      <h3>Rigor analítico</h3>
-      <p>Decisões orientadas por análise, método e consistência.</p>
-    </article>
-    <article class="principle">
-      <h3>Visão estratégica</h3>
-      <p>Compreensão integrada dos desafios e das possibilidades.</p>
-    </article>
-  </div>
-</section>
+      if (!produto.previa) {
+        return `
+          <section class="secao">
+            <div class="container">
+              <a class="voltar" href="#/produto/${escaparHTML(produto.slug)}">← Voltar à publicação</a>
+              <div class="vazio">
+                <h2 style="margin-bottom:10px">Prévia não disponível</h2>
+                <p>Esta publicação ainda não possui prévia cadastrada.</p>
+              </div>
+            </div>
+          </section>
+        `;
+      }
 
-<section class="contact" id="contato">
-  <div class="section-label">04 — CONTATO</div>
-  <h2>Vamos conversar sobre novos desafios?</h2>
-  <p>
-    Entre em contato com a ACCS Consultoria para conhecer
-    nossas possibilidades de atuação e apresentar sua demanda.
-  </p>
-  <div class="contact-label">ACCS CONSULTORIA · BRASIL</div>
-</section>
-</main>
+      return `
+        <section class="secao">
+          <div class="container">
+            <a class="voltar" href="#/produto/${escaparHTML(produto.slug)}">← Voltar à publicação</a>
 
-<footer>
-  <strong>ACCS CONSULTORIA</strong>
-  <span>Inteligência, estratégia e soluções.</span>
-  <span>© 2026 ACCS Consultoria. Todos os direitos reservados.</span>
-</footer>
+            <div class="previa-cabecalho">
+              <div>
+                <span class="produto-categoria">Prévia</span>
+                <h2>${escaparHTML(produto.nome)}</h2>
+              </div>
+              <div class="acoes">
+                ${botaoWhatsapp(mensagemCompra(produto), "Comprar pelo WhatsApp")}
+              </div>
+            </div>
 
+            <div class="visualizador">
+              <div class="visualizador-barra">
+                <button class="botao botao-claro" id="pdfAnterior" type="button" aria-label="Página anterior">←</button>
+                <span id="pdfPagina" aria-live="polite">—</span>
+                <button class="botao botao-claro" id="pdfProxima" type="button" aria-label="Próxima página">→</button>
+                <div class="visualizador-separador"></div>
+                <button class="botao botao-claro" id="pdfMenos" type="button" aria-label="Diminuir zoom">−</button>
+                <span id="pdfZoom">100%</span>
+                <button class="botao botao-claro" id="pdfMais" type="button" aria-label="Aumentar zoom">+</button>
+                <a class="botao botao-claro" href="${escaparHTML(produto.previa)}" target="_blank" rel="noopener">Abrir em nova aba</a>
+              </div>
+              <div class="visualizador-area" id="pdfArea">
+                <p class="visualizador-estado">Carregando prévia…</p>
+              </div>
+            </div>
+          </div>
+        </section>
+      `;
+    };
+
+    const paginaNaoEncontrada = () => `
+      <section class="secao">
+        <div class="container">
+          <div class="vazio">
+            <h2 style="margin-bottom:10px">Página não encontrada</h2>
+            <p>O endereço solicitado não existe ou foi alterado.</p>
+            <a class="botao" href="#/">Voltar ao início</a>
+          </div>
+        </div>
+      </section>
+    `;
+
+    /* =========================================================
+       VISUALIZADOR DE PRÉVIA (PDF.js)
+       A biblioteca é carregada somente quando uma prévia é aberta.
+       ========================================================= */
+    const PDFJS_VERSAO = "3.11.174";
+    const PDFJS_BASE = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${PDFJS_VERSAO}`;
+    const ZOOM_MIN = 0.5;
+    const ZOOM_MAX = 3;
+    const ZOOM_PASSO = 0.25;
+
+    let pdfjsPromessa = null;
+    let visualizadorAtivo = null;
+
+    const carregarPdfJs = () => {
+      if (window.pdfjsLib) return Promise.resolve(window.pdfjsLib);
+      if (pdfjsPromessa) return pdfjsPromessa;
+
+      pdfjsPromessa = new Promise((resolver, rejeitar) => {
+        const script = document.createElement("script");
+        script.src = `${PDFJS_BASE}/pdf.min.js`;
+        script.async = true;
+        script.onload = () => {
+          if (!window.pdfjsLib) {
+            rejeitar(new Error("pdf.js não expôs pdfjsLib"));
+            return;
+          }
+          window.pdfjsLib.GlobalWorkerOptions.workerSrc = `${PDFJS_BASE}/pdf.worker.min.js`;
+          resolver(window.pdfjsLib);
+        };
+        script.onerror = () => {
+          pdfjsPromessa = null;
+          script.remove();
+          rejeitar(new Error("Falha ao carregar pdf.js"));
+        };
+        document.head.appendChild(script);
+      });
+
+      return pdfjsPromessa;
+    };
+
+    const destruirVisualizador = () => {
+      if (!visualizadorAtivo) return;
+      window.removeEventListener("resize", visualizadorAtivo.aoRedimensionar);
+      visualizadorAtivo.cancelado = true;
+      visualizadorAtivo = null;
+    };
+
+    const iniciarVisualizador = async (produto) => {
+      const area = document.getElementById("pdfArea");
+      if (!area) return;
+
+      const ativo = { cancelado: false, aoRedimensionar: null };
+      const estado = { pdf: null, pagina: 1, zoom: 1, desenhando: false, pendente: false, temporizador: null };
+      visualizadorAtivo = ativo;
+
+      const controles = {
+        anterior: document.getElementById("pdfAnterior"),
+        proxima: document.getElementById("pdfProxima"),
+        menos: document.getElementById("pdfMenos"),
+        mais: document.getElementById("pdfMais"),
+        paginaTexto: document.getElementById("pdfPagina"),
+        zoomTexto: document.getElementById("pdfZoom")
+      };
+      const urlPrevia = new URL(produto.previa, document.baseURI).href;
+
+      const atualizarControles = () => {
+        const total = estado.pdf ? estado.pdf.numPages : 0;
+        controles.paginaTexto.textContent = total ? `${estado.pagina} / ${total}` : "—";
+        controles.zoomTexto.textContent = `${Math.round(estado.zoom * 100)}%`;
+        controles.anterior.disabled = !total || estado.pagina <= 1;
+        controles.proxima.disabled = !total || estado.pagina >= total;
+        controles.menos.disabled = estado.zoom <= ZOOM_MIN;
+        controles.mais.disabled = estado.zoom >= ZOOM_MAX;
+      };
+
+      const mostrarErro = (mensagem) => {
+        area.innerHTML = `
+          <div class="visualizador-estado">
+            <p>${escaparHTML(mensagem)}</p>
+            <a class="botao botao-claro" href="${escaparHTML(urlPrevia)}" target="_blank" rel="noopener">Abrir prévia em nova aba</a>
+          </div>
+        `;
+        atualizarControles();
+      };
+
+      const desenhar = async () => {
+        if (ativo.cancelado || !estado.pdf) return;
+        if (estado.desenhando) {
+          estado.pendente = true;
+          return;
+        }
+        estado.desenhando = true;
+
+        try {
+          const pagina = await estado.pdf.getPage(estado.pagina);
+          if (ativo.cancelado) return;
+
+          const larguraCss = Math.max(220, area.clientWidth - 24) * estado.zoom;
+          const base = pagina.getViewport({ scale: 1 });
+          const escalaCss = larguraCss / base.width;
+          const dpr = Math.min(window.devicePixelRatio || 1, 2);
+          const viewport = pagina.getViewport({ scale: escalaCss * dpr });
+
+          const canvas = document.createElement("canvas");
+          canvas.width = Math.floor(viewport.width);
+          canvas.height = Math.floor(viewport.height);
+          canvas.style.width = `${Math.floor(larguraCss)}px`;
+          canvas.style.height = "auto";
+          canvas.setAttribute("role", "img");
+          canvas.setAttribute("aria-label", `Página ${estado.pagina} de ${estado.pdf.numPages} da prévia`);
+
+          await pagina.render({ canvasContext: canvas.getContext("2d"), viewport }).promise;
+          if (ativo.cancelado) return;
+          area.replaceChildren(canvas);
+        } catch (erro) {
+          console.warn("Erro ao exibir a prévia:", erro);
+          if (!ativo.cancelado) mostrarErro("Não foi possível exibir esta página da prévia.");
+        } finally {
+          estado.desenhando = false;
+          if (estado.pendente && !ativo.cancelado) {
+            estado.pendente = false;
+            desenhar();
+          }
+        }
+      };
+
+      const irParaPagina = (numero) => {
+        if (!estado.pdf || numero < 1 || numero > estado.pdf.numPages) return;
+        estado.pagina = numero;
+        area.scrollTop = 0;
+        atualizarControles();
+        desenhar();
+      };
+
+      const alterarZoom = (delta) => {
+        estado.zoom = Math.min(ZOOM_MAX, Math.max(ZOOM_MIN, Math.round((estado.zoom + delta) * 100) / 100));
+        atualizarControles();
+        desenhar();
+      };
+
+      controles.anterior.addEventListener("click", () => irParaPagina(estado.pagina - 1));
+      controles.proxima.addEventListener("click", () => irParaPagina(estado.pagina + 1));
+      controles.menos.addEventListener("click", () => alterarZoom(-ZOOM_PASSO));
+      controles.mais.addEventListener("click", () => alterarZoom(ZOOM_PASSO));
+
+      ativo.aoRedimensionar = () => {
+        clearTimeout(estado.temporizador);
+        estado.temporizador = setTimeout(desenhar, 200);
+      };
+      window.addEventListener("resize", ativo.aoRedimensionar);
+
+      atualizarControles();
+
+      try {
+        const pdfjs = await carregarPdfJs();
+        if (ativo.cancelado) return;
+
+        const documento = await pdfjs.getDocument(urlPrevia).promise;
+        if (ativo.cancelado) return;
+
+        estado.pdf = documento;
+        estado.pagina = 1;
+        atualizarControles();
+        await desenhar();
+      } catch (erro) {
+        console.warn("Visualizador indisponível:", erro);
+        if (!ativo.cancelado) mostrarErro("Não foi possível carregar o visualizador de prévia neste momento.");
+      }
+    };
+
+    /* =========================================================
+       ROTEADOR E EVENTOS
+       ========================================================= */
+    const TITULO_PADRAO = document.title;
+
+    const definirTitulo = (titulo) => {
+      document.title = titulo ? `${titulo} — ACCS CONSULTORIA` : TITULO_PADRAO;
+    };
+
+    const atualizarNavegacaoAtiva = (caminho) => {
+      navegacao.querySelectorAll("a[data-rota]").forEach((link) => {
+        link.classList.toggle("ativo", link.dataset.rota === caminho);
+      });
+    };
+
+    const fecharMenu = () => {
+      navegacao.classList.remove("aberta");
+      menuBotao.setAttribute("aria-expanded", "false");
+    };
+
+    const renderizarRota = () => {
+      if (!catalogoPronto) return;
+      destruirVisualizador();
+
+      const { caminho, parametros, ancora } = obterRota();
+      let html;
+      let titulo = "";
+      let produtoAtual = null;
+
+      if (caminho === "/") {
+        html = paginaInicial();
+      } else if (caminho === "/catalogo") {
+        html = paginaCatalogo(parametros);
+        titulo = "Catálogo";
+      } else if (caminho.startsWith("/produto/")) {
+        const slug = decodificar(caminho.slice("/produto/".length));
+        produtoAtual = PRODUTOS.find((item) => item.slug === slug) || null;
+        html = paginaProduto(slug);
+        titulo = produtoAtual ? produtoAtual.nome : "";
+      } else if (caminho.startsWith("/previa/")) {
+        const slug = decodificar(caminho.slice("/previa/".length));
+        produtoAtual = PRODUTOS.find((item) => item.slug === slug) || null;
+        html = paginaPrevia(slug);
+        titulo = produtoAtual ? `Prévia — ${produtoAtual.nome}` : "";
+      } else {
+        html = paginaNaoEncontrada();
+        titulo = "Página não encontrada";
+      }
+
+      app.innerHTML = html;
+      definirTitulo(titulo);
+      atualizarNavegacaoAtiva(caminho);
+      fecharMenu();
+
+      const alvo = ancora ? document.getElementById(ancora) : null;
+      if (alvo) alvo.scrollIntoView({ block: "start" });
+      else window.scrollTo({ top: 0 });
+
+      if (caminho.startsWith("/previa/") && produtoAtual && produtoAtual.previa) {
+        iniciarVisualizador(produtoAtual);
+      }
+    };
+
+    const aplicarWhatsappRodape = () => {
+      const link = document.getElementById("whatsappRodape");
+      if (!link) return;
+      const url = linkWhatsapp();
+      if (url) {
+        link.href = url;
+        link.target = "_blank";
+        link.rel = "noopener";
+        link.textContent = "WhatsApp";
+      } else {
+        link.removeAttribute("href");
+        link.textContent = "WhatsApp: em breve";
+      }
+    };
+
+    menuBotao.addEventListener("click", () => {
+      const aberta = navegacao.classList.toggle("aberta");
+      menuBotao.setAttribute("aria-expanded", String(aberta));
+    });
+
+    app.addEventListener("submit", (evento) => {
+      const formulario = evento.target;
+      if (!(formulario instanceof HTMLFormElement) || formulario.id !== "formFiltros") return;
+      evento.preventDefault();
+
+      const dados = new FormData(formulario);
+      const parametros = new URLSearchParams();
+      ["busca", "categoria", "ordem"].forEach((chave) => {
+        const valor = String(dados.get(chave) || "").trim();
+        if (valor && !(chave === "ordem" && valor === "recentes")) parametros.set(chave, valor);
+      });
+
+      const query = parametros.toString();
+      window.location.hash = `/catalogo${query ? `?${query}` : ""}`;
+    });
+
+    app.addEventListener("change", (evento) => {
+      const alvo = evento.target;
+      if (alvo.tagName === "SELECT" && alvo.form && alvo.form.id === "formFiltros") {
+        alvo.form.requestSubmit();
+      }
+    });
+
+    app.addEventListener("click", (evento) => {
+      const botao = evento.target.closest("button[data-pagina]");
+      if (!botao || botao.disabled) return;
+
+      const { parametros } = obterRota();
+      parametros.set("pagina", botao.dataset.pagina);
+      window.location.hash = `/catalogo?${parametros.toString()}`;
+    });
+
+    window.addEventListener("hashchange", renderizarRota);
+
+    document.getElementById("anoAtual").textContent = String(new Date().getFullYear());
+    aplicarWhatsappRodape();
+    app.innerHTML = `
+      <section class="secao">
+        <div class="container">
+          <div class="vazio">Carregando catálogo…</div>
+        </div>
+      </section>
+    `;
+
+    carregarPublicacoes().finally(() => {
+      catalogoPronto = true;
+      renderizarRota();
+    });
+  </script>
 </body>
 </html>

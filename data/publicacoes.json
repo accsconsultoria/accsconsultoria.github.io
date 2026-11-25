@@ -1,0 +1,4 @@
+{
+  "_comoCadastrar": "Adicione um objeto por publicação dentro de \"publicacoes\". Campos: slug (único, sem espaços), nome, categoria (id de CONFIGURACAO.categorias no index.html: ebooks, livros-digitais, pdfs, apostilas, cursos), autor, formato, preco, descricaoCurta, descricaoCompleta, capa (ex.: assets/capas/nome.jpg), previa (ex.: previews/nome.pdf, somente prévia autorizada), destaque (true/false), lancamento (true/false), hotmart e kiwify (opcionais).",
+  "publicacoes": []
+}
