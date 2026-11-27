@@ -131,7 +131,7 @@
       border:1px solid var(--linha);background:var(--vidro);color:var(--muted);
     }
     .hero-badge i{width:8px;height:8px;border-radius:50%;background:var(--cyan);box-shadow:0 0 12px var(--cyan)}
-    .hero-title{font-size:clamp(2.6rem,7.4vw,6.2rem);font-weight:800;margin:26px 0 24px;max-width:13ch}
+    .hero-title{font-size:clamp(2.6rem,6.2vw,5.2rem);font-weight:800;margin:26px 0 24px;max-width:12ch}
     .word{display:inline-block;overflow:hidden;vertical-align:top;padding-bottom:.08em;margin-right:.18em}
     .word>span{display:inline-block}
     .grad{background:linear-gradient(120deg,#A5B4FC 0%,var(--indigo) 35%,var(--cyan) 100%);-webkit-background-clip:text;background-clip:text;color:transparent}
@@ -559,7 +559,7 @@
       menuBotao.setAttribute('aria-expanded', 'false');
     }));
 
-    /* ---------- Hero 3D: nuvem procedural reativa ao mouse ---------- */
+    /* ---------- Hero 3D: cérebro procedural com rede neural ---------- */
     function iniciarHero() {
       const canvas = document.getElementById('hero-canvas');
       if (!canvas || reduzir || pequeno) return;
@@ -573,40 +573,146 @@
 
       const cena = new THREE.Scene();
       const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 100);
-      camera.position.z = 5.2;
+      camera.position.z = 5.4;
 
-      const total = 2000;
-      const base = new Float32Array(total * 3);
-      const posicao = new Float32Array(total * 3);
-      const cor = new Float32Array(total * 3);
-      const indigo = new THREE.Color('#6366F1');
-      const cyan = new THREE.Color('#06B6D4');
-      const c = new THREE.Color();
-      for (let i = 0; i < total; i++) {
-        // distribuição de Fibonacci sobre a esfera
-        const y = 1 - (i / (total - 1)) * 2;
-        const raio = Math.sqrt(1 - y * y);
-        const teta = i * Math.PI * (3 - Math.sqrt(5));
-        const x = Math.cos(teta) * raio;
-        const z = Math.sin(teta) * raio;
-        base.set([x, y, z], i * 3);
-        posicao.set([x, y, z], i * 3);
-        c.copy(indigo).lerp(cyan, (y + 1) / 2);
-        cor.set([c.r, c.g, c.b], i * 3);
+      // Gerador pseudoaleatório com semente fixa: a forma do cérebro é sempre a mesma
+      const criarAleatorio = (a) => () => {
+        a |= 0; a = (a + 0x6D2B79F5) | 0;
+        let t = Math.imul(a ^ (a >>> 15), 1 | a);
+        t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+        return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+      };
+      const aleatorio = criarAleatorio(20261127);
+
+      /* Neurônios: dois hemisférios com sulcos, cerebelo e tronco encefálico */
+      const nos = [];
+      const direcao = () => {
+        const u = aleatorio() * 2 - 1;
+        const ang = aleatorio() * Math.PI * 2;
+        const r = Math.sqrt(1 - u * u);
+        return [r * Math.cos(ang), u, r * Math.sin(ang)];
+      };
+
+      const hemisferio = (lado, quantidade) => {
+        for (let i = 0; i < quantidade; i++) {
+          const [dx, dy, dz] = direcao();
+          const relevo = 1
+            + 0.06 * Math.sin(dx * 8 + dy * 6) * Math.cos(dz * 7 - dy * 5)
+            + 0.035 * Math.sin(dz * 15 + dx * 9);
+          const prof = aleatorio() < 0.14 ? 0.35 + aleatorio() * 0.5 : 1; // parte dos neurônios no interior
+          let x = lado * 0.5 + dx * 0.47 * relevo * prof;
+          let y = 0.08 + dy * 0.62 * relevo * prof;
+          const z = dz * 1.1 * relevo * prof;
+          if (lado * x < 0.03) x = lado * 0.03;            // fissura longitudinal entre os hemisférios
+          if (y < -0.3) y = -0.3 + (y + 0.3) * 0.35;       // base achatada
+          nos.push(new THREE.Vector3(x, y, z));
+        }
+      };
+      hemisferio(-1, 240);
+      hemisferio(1, 240);
+
+      for (let i = 0; i < 70; i++) {                        // cerebelo
+        const [dx, dy, dz] = direcao();
+        nos.push(new THREE.Vector3(dx * 0.55, -0.55 + dy * 0.25, -0.85 + dz * 0.32));
+      }
+      for (let i = 0; i < 16; i++) {                        // tronco encefálico
+        const k = i / 15;
+        nos.push(new THREE.Vector3(
+          (aleatorio() - 0.5) * 0.12,
+          -0.45 - k * 0.6,
+          -0.25 - k * 0.2 + (aleatorio() - 0.5) * 0.1
+        ));
       }
 
-      const geo = new THREE.BufferGeometry();
-      geo.setAttribute('position', new THREE.BufferAttribute(posicao, 3));
-      geo.setAttribute('color', new THREE.BufferAttribute(cor, 3));
-      const pontos = new THREE.Points(geo, new THREE.PointsMaterial({
-        size: 0.03, vertexColors: true, transparent: true, opacity: 0.9, depthWrite: false
+      /* Sinapses: cada neurônio liga-se aos vizinhos mais próximos */
+      const arestas = [];
+      const existentes = new Set();
+      nos.forEach((no, i) => {
+        const vizinhos = nos
+          .map((outro, j) => ({ j, d: no.distanceToSquared(outro) }))
+          .filter((v) => v.j !== i && v.d < 0.16)
+          .sort((a, b) => a.d - b.d)
+          .slice(0, 3);
+        vizinhos.forEach(({ j }) => {
+          const chave = i < j ? `${i}-${j}` : `${j}-${i}`;
+          if (existentes.has(chave)) return;
+          existentes.add(chave);
+          arestas.push([i, j]);
+        });
+      });
+      const adjacencia = nos.map(() => []);
+      arestas.forEach(([a, b], k) => { adjacencia[a].push(k); adjacencia[b].push(k); });
+
+      /* Cores: índigo na frente, ciano atrás */
+      const indigo = new THREE.Color('#6366F1');
+      const cyan = new THREE.Color('#06B6D4');
+      const coresNo = nos.map((no) => new THREE.Color().copy(indigo).lerp(cyan, Math.min(1, Math.max(0, (no.z + 1.2) / 2.4))));
+
+      /* Geometrias */
+      const posNos = new Float32Array(nos.length * 3);
+      const corNos = new Float32Array(nos.length * 3);
+      nos.forEach((no, i) => {
+        no.toArray(posNos, i * 3);
+        corNos[i * 3] = coresNo[i].r; corNos[i * 3 + 1] = coresNo[i].g; corNos[i * 3 + 2] = coresNo[i].b;
+      });
+      const geoNos = new THREE.BufferGeometry();
+      geoNos.setAttribute('position', new THREE.BufferAttribute(posNos, 3));
+      geoNos.setAttribute('color', new THREE.BufferAttribute(corNos, 3));
+
+      const posLinhas = new Float32Array(arestas.length * 6);
+      const corLinhas = new Float32Array(arestas.length * 6);
+      arestas.forEach(([a, b], k) => {
+        nos[a].toArray(posLinhas, k * 6);
+        nos[b].toArray(posLinhas, k * 6 + 3);
+        corLinhas.set([coresNo[a].r, coresNo[a].g, coresNo[a].b, coresNo[b].r, coresNo[b].g, coresNo[b].b], k * 6);
+      });
+      const geoLinhas = new THREE.BufferGeometry();
+      geoLinhas.setAttribute('position', new THREE.BufferAttribute(posLinhas, 3));
+      geoLinhas.setAttribute('color', new THREE.BufferAttribute(corLinhas, 3));
+
+      /* Textura circular com brilho suave para os neurônios */
+      const textura = (() => {
+        const c = document.createElement('canvas');
+        c.width = c.height = 64;
+        const g = c.getContext('2d');
+        const grad = g.createRadialGradient(32, 32, 0, 32, 32, 32);
+        grad.addColorStop(0, 'rgba(255,255,255,1)');
+        grad.addColorStop(0.35, 'rgba(255,255,255,.55)');
+        grad.addColorStop(1, 'rgba(255,255,255,0)');
+        g.fillStyle = grad;
+        g.fillRect(0, 0, 64, 64);
+        return new THREE.CanvasTexture(c);
+      })();
+
+      const materialPonto = (tamanho, opacidade) => new THREE.PointsMaterial({
+        size: tamanho, map: textura, vertexColors: true, transparent: true, opacity: opacidade,
+        depthWrite: false, blending: THREE.AdditiveBlending
+      });
+
+      const neuronios = new THREE.Points(geoNos, materialPonto(0.085, 0.95));
+      const sinapses = new THREE.LineSegments(geoLinhas, new THREE.LineBasicMaterial({
+        vertexColors: true, transparent: true, opacity: 0.38, depthWrite: false, blending: THREE.AdditiveBlending
       }));
-      const malha = new THREE.Mesh(
-        new THREE.IcosahedronGeometry(1.02, 2),
-        new THREE.MeshBasicMaterial({ color: 0x6366f1, wireframe: true, transparent: true, opacity: 0.1 })
-      );
+
+      /* Pulsos elétricos que percorrem as sinapses */
+      const totalPulsos = 56;
+      const pulsos = Array.from({ length: totalPulsos }, () => {
+        const de = Math.floor(Math.random() * nos.length);
+        const lista = adjacencia[de].length ? adjacencia[de] : [0];
+        const aresta = lista[Math.floor(Math.random() * lista.length)];
+        const [a, b] = arestas[aresta] || [de, de];
+        return { de, para: a === de ? b : a, t: Math.random(), v: 0.9 + Math.random() * 1.2 };
+      });
+      const posPulsos = new Float32Array(totalPulsos * 3);
+      const corPulsos = new Float32Array(totalPulsos * 3);
+      for (let i = 0; i < totalPulsos; i++) corPulsos.set([0.75, 0.97, 1], i * 3);
+      const geoPulsos = new THREE.BufferGeometry();
+      geoPulsos.setAttribute('position', new THREE.BufferAttribute(posPulsos, 3));
+      geoPulsos.setAttribute('color', new THREE.BufferAttribute(corPulsos, 3));
+      const pontosPulsos = new THREE.Points(geoPulsos, materialPonto(0.17, 1));
+
       const grupo = new THREE.Group();
-      grupo.add(pontos, malha);
+      grupo.add(sinapses, neuronios, pontosPulsos);
       cena.add(grupo);
 
       const alvo = { x: 0, y: 0 };
@@ -622,6 +728,7 @@
         renderer.setSize(w, h, false);
         camera.aspect = w / h;
         camera.updateProjectionMatrix();
+        grupo.position.set(camera.aspect > 1.3 ? 1.45 : 0, -0.05, 0); // cérebro à direita, texto à esquerda
       };
       redimensionar();
       window.addEventListener('resize', redimensionar);
@@ -630,23 +737,35 @@
       new IntersectionObserver(([entrada]) => { visivel = entrada.isIntersecting; }).observe(canvas);
 
       const relogio = new THREE.Clock();
+      const temp = new THREE.Vector3();
       const quadro = () => {
         requestAnimationFrame(quadro);
         if (!visivel) return;
-        const t = relogio.getElapsedTime();
-        const p = geo.attributes.position.array;
-        for (let i = 0; i < total; i++) {
-          const j = i * 3;
-          const k = 1 + 0.08 * Math.sin(base[j] * 3 + t * 1.4) * Math.cos(base[j + 1] * 3 - t);
-          p[j] = base[j] * k;
-          p[j + 1] = base[j + 1] * k;
-          p[j + 2] = base[j + 2] * k;
+        const dt = Math.min(relogio.getDelta(), 0.05);
+        const t = relogio.elapsedTime;
+
+        for (let i = 0; i < totalPulsos; i++) {
+          const p = pulsos[i];
+          p.t += dt * p.v;
+          if (p.t >= 1) {                                  // chegou a um neurônio: segue por outra sinapse
+            const proximas = adjacencia[p.para];
+            if (proximas.length) {
+              const k = proximas[Math.floor(Math.random() * proximas.length)];
+              const [a, b] = arestas[k];
+              p.de = p.para;
+              p.para = a === p.para ? b : a;
+            }
+            p.t = 0;
+          }
+          temp.copy(nos[p.de]).lerp(nos[p.para], p.t).toArray(posPulsos, i * 3);
         }
-        geo.attributes.position.needsUpdate = true;
+        geoPulsos.attributes.position.needsUpdate = true;
+
         atual.x += (alvo.x - atual.x) * 0.04;
         atual.y += (alvo.y - atual.y) * 0.04;
-        grupo.rotation.y = t * 0.08 + atual.x * 0.8;
-        grupo.rotation.x = atual.y * 0.6;
+        grupo.rotation.y = -1.3 + Math.sin(t * 0.22) * 0.4 + atual.x * 0.7;
+        grupo.rotation.x = 0.12 + atual.y * 0.4;
+        grupo.scale.setScalar(1.08 + Math.sin(t * 1.4) * 0.015);
         renderer.render(cena, camera);
       };
       quadro();
