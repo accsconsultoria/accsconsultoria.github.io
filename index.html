@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>ACCS CONSULTORIA — Livros digitais, e-books, apostilas e cursos</title>
-  <meta name="description" content="Loja virtual da ACCS CONSULTORIA: livros digitais, PDFs, e-books, apostilas e cursos. Catálogo, pesquisa, filtros e links de compra em Hotmart e Kiwify.">
+  <meta name="description" content="Vitrine digital da ACCS CONSULTORIA: livros digitais, PDFs, e-books, apostilas e cursos. Conheça os materiais e fale pelo WhatsApp para adquirir.">
   <meta name="author" content="ACCS CONSULTORIA">
   <meta name="robots" content="index, follow">
   <meta property="og:type" content="website">
@@ -23,7 +23,7 @@
     "@type": "Organization",
     "name": "ACCS CONSULTORIA",
     "url": "https://accsconsultoria.github.io/",
-    "description": "Loja virtual de livros digitais, PDFs, e-books, apostilas e cursos."
+    "description": "Vitrine digital de livros digitais, PDFs, e-books, apostilas e cursos."
   }
   </script>
 
@@ -692,6 +692,12 @@
       .visualizador-barra .botao{padding:8px 11px}
       .visualizador-separador{display:none}
     }
+    .detalhe-bloco{margin:28px 0}
+    .detalhe-bloco h3{font-size:.85rem;letter-spacing:.08em;text-transform:uppercase;margin:0 0 12px}
+    .detalhe-bloco p{color:var(--cinza-700);margin:0}
+    .lista-conteudo{list-style:none;margin:0;padding:0}
+    .lista-conteudo li{position:relative;padding:7px 0 7px 26px;color:var(--cinza-700)}
+    .lista-conteudo li::before{content:"";position:absolute;left:2px;top:17px;width:8px;height:8px;border-radius:50%;background:var(--preto)}
   </style>
 </head>
 
@@ -729,7 +735,7 @@
             <span>ACCS Consultoria</span>
           </div>
           <p style="margin-top:18px;max-width:420px">
-            Conteúdos digitais, materiais de estudo e cursos organizados para compra segura por plataformas de pagamento.
+            Vitrine de conteúdos digitais e materiais de estudo. A negociação e a compra são feitas diretamente pelo WhatsApp.
           </p>
         </div>
 
@@ -796,7 +802,7 @@
 
        Campos:
        - slug: identificador único, sem espaços ou acentos.
-       - nome, autor, formato, preco: textos exibidos na loja.
+       - nome, autor, formato, preco: textos exibidos na vitrine. Em formato, informe o formato de entrega.
        - categoria: um dos ids de CONFIGURACAO.categorias.
        - descricaoCurta: texto exibido no catálogo.
        - descricaoCompleta: texto exibido na página da publicação.
@@ -804,7 +810,7 @@
        - previa: PDF de prévia autorizado, por exemplo "previews/nome.pdf".
          Somente arquivos dentro da pasta previews/ são aceitos.
        - destaque, lancamento: true ou false.
-       - hotmart, kiwify: opcionais.
+       - conteudo: lista de itens de conteúdo e benefícios, exibida na página da publicação.
        ========================================================= */
     const CAMINHO_CATALOGO = "data/publicacoes.json";
     let PRODUTOS = [];
@@ -826,8 +832,9 @@
         previa: /^previews\/[\w.-]+\.pdf$/i.test(previa) ? previa : "",
         destaque: item.destaque === true,
         lancamento: item.lancamento === true,
-        hotmart: String(item.hotmart || "").trim(),
-        kiwify: String(item.kiwify || "").trim()
+        conteudo: Array.isArray(item.conteudo)
+          ? item.conteudo.map((linha) => String(linha || "").trim()).filter(Boolean)
+          : []
       };
     };
 
@@ -913,7 +920,7 @@
     };
 
     const mensagemCompra = (produto) =>
-      `Olá! Tenho interesse na publicação "${produto.nome}" da ACCS CONSULTORIA. Poderia me passar as informações para a compra?`;
+      `Olá! Tenho interesse no produto ${produto.nome}. Gostaria de conhecer os valores e as condições de aquisição.`;
 
     const botaoWhatsapp = (mensagem, rotulo, classe = "botao") => {
       const url = linkWhatsapp(mensagem);
@@ -952,38 +959,6 @@
       `;
     };
 
-    const plataformasCompra = (produto) => {
-      const plataformas = [];
-
-      if (produto.hotmart) {
-        plataformas.push(`
-          <a class="plataforma" href="${escaparHTML(produto.hotmart)}" target="_blank" rel="noopener">
-            <span>
-              <span class="plataforma-nome">Comprar na Hotmart</span>
-              <span class="plataforma-descricao">Checkout seguro da plataforma</span>
-            </span>
-            <span aria-hidden="true">→</span>
-          </a>
-        `);
-      }
-
-      if (produto.kiwify) {
-        plataformas.push(`
-          <a class="plataforma" href="${escaparHTML(produto.kiwify)}" target="_blank" rel="noopener">
-            <span>
-              <span class="plataforma-nome">Comprar na Kiwify</span>
-              <span class="plataforma-descricao">Checkout seguro da plataforma</span>
-            </span>
-            <span aria-hidden="true">→</span>
-          </a>
-        `);
-      }
-
-      return plataformas.length
-        ? `<div class="plataformas">${plataformas.join("")}</div>`
-        : `<div class="aviso">Nenhum link de compra foi cadastrado para este produto.</div>`;
-    };
-
     const cartaoProduto = (produto) => `
       <article class="produto">
         <a href="#/produto/${escaparHTML(produto.slug)}" aria-label="Ver produto ${escaparHTML(produto.nome)}">
@@ -996,7 +971,7 @@
           </a>
           <p class="produto-descricao">${escaparHTML(produto.descricaoCurta)}</p>
           <div class="produto-preco">
-            ${escaparHTML(produto.preco)}
+            ${produto.preco ? escaparHTML(produto.preco) : "Consulte valores pelo WhatsApp"}
             <span>Produto digital</span>
           </div>
           <a class="botao botao-comprar" href="#/produto/${escaparHTML(produto.slug)}">Ver produto</a>
@@ -1020,7 +995,7 @@
       return `
         <section class="hero">
           <div class="container hero-conteudo">
-            <span class="selo">Loja digital</span>
+            <span class="selo">Vitrine digital</span>
             <h1>Conteúdos digitais da ACCS CONSULTORIA</h1>
             <p>${escaparHTML(CONFIGURACAO.descricaoCurta)}</p>
             <div class="acoes">
@@ -1061,7 +1036,7 @@
             <div class="secao-cabecalho">
               <div>
                 <h2>Como funciona</h2>
-                <p>Escolha o material, finalize a compra na plataforma de pagamento e receba o acesso conforme a configuração do produto.</p>
+                <p>Conheça o material, tire suas dúvidas e combine a compra diretamente pelo WhatsApp.</p>
               </div>
             </div>
 
@@ -1069,19 +1044,19 @@
               <article class="beneficio">
                 <span class="beneficio-numero">01</span>
                 <h3>Escolha o material</h3>
-                <p> navegue pelo catálogo, use a pesquisa e os filtros para localizar e-books, PDFs, apostilas ou cursos.</p>
+                <p>Navegue pelo catálogo e use a pesquisa e os filtros para localizar e-books, PDFs, apostilas ou cursos.</p>
               </article>
 
               <article class="beneficio">
                 <span class="beneficio-numero">02</span>
-                <h3>Finalize a compra</h3>
+                <h3>Fale pelo WhatsApp</h3>
                 <p>Os botões de compra direcionam para o atendimento individual pelo WhatsApp, onde você recebe as condições da publicação.</p>
               </article>
 
               <article class="beneficio">
                 <span class="beneficio-numero">03</span>
-                <h3>Acesse o conteúdo</h3>
-                <p>O acesso, entrega e suporte seguem as condições definidas em cada página de produto e plataforma de pagamento.</p>
+                <h3>Receba o material</h3>
+                <p>Após a confirmação do pagamento, o material é entregue manualmente pelo atendimento.</p>
               </article>
             </div>
           </div>
@@ -1101,7 +1076,7 @@
 
             <div class="beneficio">
               <h3>Atendimento</h3>
-              <p>O atendimento é realizado pelos canais institucionais informados nesta página. Para questões de pagamento, entrega ou reembolso, consulte também as condições da plataforma utilizada na compra.</p>
+              <p>O atendimento é realizado pelos canais institucionais informados nesta página. Negociação, pagamento e entrega são combinados diretamente com o atendimento pelo WhatsApp.</p>
               ${botaoWhatsapp("", "Enviar mensagem")}
             </div>
           </div>
@@ -1235,9 +1210,6 @@
                 : ""
             }
 
-            <div class="aviso">
-              Área de cadastro: as publicações são cadastradas em <strong>data/publicacoes.json</strong>, sem alterar este script. Os links de Hotmart e Kiwify são opcionais.
-            </div>
           </div>
         </section>
       `;
@@ -1268,10 +1240,21 @@
         ? `<a class="botao botao-claro" href="#/previa/${escaparHTML(produto.slug)}">Ver prévia</a>`
         : "";
 
-      const detalhes = [
-        produto.autor ? `Autoria: ${escaparHTML(produto.autor)}` : "",
-        produto.formato ? escaparHTML(produto.formato) : ""
-      ].filter(Boolean);
+      const autoria = produto.autor ? `Autoria: ${escaparHTML(produto.autor)}` : "";
+      const conteudo = produto.conteudo.length
+        ? `<div class="detalhe-bloco">
+                    <h3>Conteúdo e benefícios</h3>
+                    <ul class="lista-conteudo">
+                      ${produto.conteudo.map((linha) => `<li>${escaparHTML(linha)}</li>`).join("")}
+                    </ul>
+                  </div>`
+        : "";
+      const formatoEntrega = produto.formato
+        ? `<div class="detalhe-bloco">
+                    <h3>Formato de entrega</h3>
+                    <p>${escaparHTML(produto.formato)}</p>
+                  </div>`
+        : "";
 
       return `
         <section class="secao">
@@ -1290,11 +1273,14 @@
               <div class="detalhe-info">
                 <span class="produto-categoria">${escaparHTML(categoriaPorId(produto.categoria))}</span>
                 <h1>${escaparHTML(produto.nome)}</h1>
-                ${detalhes.length ? `<p class="detalhe-meta">${detalhes.join(" · ")}</p>` : ""}
+                ${autoria ? `<p class="detalhe-meta">${autoria}</p>` : ""}
                 <p>${escaparHTML(produto.descricaoCompleta || produto.descricaoCurta)}</p>
 
+                ${conteudo}
+                ${formatoEntrega}
+
                 <div class="produto-preco">
-                  ${produto.preco ? escaparHTML(produto.preco) : ""}
+                  ${produto.preco ? escaparHTML(produto.preco) : "Consulte valores pelo WhatsApp"}
                   <span>Produto digital</span>
                 </div>
 
@@ -1303,7 +1289,6 @@
                   ${botaoWhatsapp(mensagemCompra(produto), "Comprar pelo WhatsApp")}
                 </div>
 
-                ${produto.hotmart || produto.kiwify ? plataformasCompra(produto) : ""}
               </div>
             </div>
           </div>

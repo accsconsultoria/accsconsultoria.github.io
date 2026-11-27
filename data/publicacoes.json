@@ -1,4 +1,27 @@
 {
-  "_comoCadastrar": "Adicione um objeto por publicação dentro de \"publicacoes\". Campos: slug (único, sem espaços), nome, categoria (id de CONFIGURACAO.categorias no index.html: ebooks, livros-digitais, pdfs, apostilas, cursos), autor, formato, preco, descricaoCurta, descricaoCompleta, capa (ex.: assets/capas/nome.jpg), previa (ex.: previews/nome.pdf, somente prévia autorizada), destaque (true/false), lancamento (true/false), hotmart e kiwify (opcionais).",
-  "publicacoes": []
+  "_comoCadastrar": "Vitrine: cada publicação é apresentada e vendida pelo WhatsApp; não há checkout. Adicione um objeto por publicação em \"publicacoes\". Campos: slug (único, sem espaços), nome, categoria (id de CONFIGURACAO.categorias no index.html: ebooks, livros-digitais, pdfs, apostilas, cursos), autor, formato (formato de entrega), preco (vazio = \"Consulte valores pelo WhatsApp\"), descricaoCurta, descricaoCompleta, conteudo (lista de itens de conteúdo e benefícios), capa (ex.: assets/capas/nome.jpg), previa (ex.: previews/nome.pdf, somente prévia autorizada), destaque e lancamento (true/false).",
+  "publicacoes": [
+    {
+      "slug": "cursos-ses-df-especialista",
+      "nome": "Cursos SES-DF Especialista",
+      "categoria": "cursos",
+      "autor": "",
+      "formato": "Material digital em PDF e acesso ao artefato interativo de resolução de questões. O link do artefato é entregue individualmente pelo atendimento, após a negociação e a confirmação do pagamento.",
+      "preco": "",
+      "descricaoCurta": "Material digital em PDF com acesso ao artefato interativo para resolução de questões, organizadas por capítulo.",
+      "descricaoCompleta": "Produto composto por material digital em PDF e acesso ao artefato interativo de resolução de questões. As questões são organizadas por capítulo, com comentários e explicações, e o artefato oferece favoritos, histórico e acompanhamento de desempenho.",
+      "conteudo": [
+        "Material digital em PDF",
+        "Acesso ao artefato interativo de resolução de questões",
+        "Questões organizadas por capítulo",
+        "Comentários e explicações",
+        "Favoritos e histórico",
+        "Acompanhamento de desempenho"
+      ],
+      "capa": "",
+      "previa": "",
+      "destaque": false,
+      "lancamento": false
+    }
+  ]
 }
