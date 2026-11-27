@@ -4,8 +4,9 @@ Site estático da ACCS CONSULTORIA (GitHub Pages).
 
 ## Estrutura
 
-- `index.html`: aplicação (roteamento por hash, catálogo, busca, filtros, paginação, página da publicação e visualizador de prévia).
-- `data/publicacoes.json`: cadastro central das publicações.
+- `index.html`: landing page (Three.js, GSAP ScrollTrigger e Lenis, carregados por CDN com versões fixas).
+- `catalogo/index.html`: vitrine com catálogo, busca, filtros, paginação, página da publicação e visualizador de prévia (rota `catalogo/#/catalogo`).
+- `data/publicacoes.json`: cadastro central das publicações. A landing e a vitrine leem o mesmo arquivo.
 - `assets/capas/`: capas das publicações.
 - `previews/`: PDFs de prévia autorizados. Nunca coloque aqui o material completo: tudo o que está no repositório fica público.
 - `legado/institucional-estatico.html`: versão institucional anterior, arquivada e fora da navegação.
