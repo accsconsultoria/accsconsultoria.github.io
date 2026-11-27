@@ -22,6 +22,25 @@
       "previa": "",
       "destaque": false,
       "lancamento": false
+    },
+    {
+      "slug": "farmaceutico-bioquimico",
+      "nome": "Farmacêutico-Bioquímico",
+      "categoria": "livros-digitais",
+      "autor": "",
+      "formato": "Edição digital em PDF. Entrega individual pelo atendimento, após a confirmação do pagamento.",
+      "preco": "",
+      "descricaoCurta": "Livro de referência para o cargo 106 — SES-DF, banca CEBRASPE.",
+      "descricaoCompleta": "Livro de referência para o cargo 106 da SES-DF, banca CEBRASPE. Coleção Farmácia.",
+      "conteudo": [
+        "622 itens Certo/Errado inéditos, com gabarito, comentário e fundamentação",
+        "Sete capítulos com simulado integrado ao final de cada um",
+        "96 figuras de apoio ao texto didático"
+      ],
+      "capa": "",
+      "previa": "",
+      "destaque": false,
+      "lancamento": false
     }
   ]
 }
