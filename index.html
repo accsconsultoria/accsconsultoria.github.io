@@ -428,7 +428,7 @@
         const largo = camera.aspect > 1.2;
         grupo.scale.setScalar(largo ? 1.75 : Math.min(1.75, (larguraVisivel * 0.94) / 2));
         // Sobe a esfera: a folga vertical acompanha a altura visível da tela
-        grupo.position.set(largo ? Math.min(1.2, larguraVisivel / 2 - 1.75) : 0, alturaVisivel * 0.12, 0);
+        grupo.position.set(largo ? Math.min(1.2, larguraVisivel / 2 - 1.75) : 0, alturaVisivel * 0.17, 0);
       };
       redimensionar();
       window.addEventListener('resize', redimensionar);
