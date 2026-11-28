@@ -48,10 +48,10 @@ const mf = new Miniflare({
   modulesRules: [{ type: "ESModule", include: ["**/*.js"] }],
   compatibilityDate: "2025-06-01",
   host: "127.0.0.1", port: 8851,
-  d1Databases: { DB: "e2e-db" }, r2Buckets: { FILES: "e2e-files" },
+  d1Databases: { DB: "e2e-db" }, r2Buckets: { BUCKET: "e2e-bucket" },
   bindings: {
     MP_ACCESS_TOKEN: "TEST-e2e", MP_WEBHOOK_SECRET: SEGREDO, RESEND_API_KEY: "re_e2e",
-    SITE_ORIGIN: SITE, WORKER_ORIGIN: API, ENABLE_PIX: "true", MP_ENV: "prod",
+    SITE_ORIGIN: SITE, WORKER_ORIGIN: API, DOWNLOAD_ORIGIN: API, ENABLE_PIX: "true", MP_ENV: "prod", RATE_IP_MAX: "1000", RATE_EMAIL_MAX: "1000",
     LINK_TTL_HOURS: "168", MAX_DOWNLOADS: "5", EMAIL_FROM: "Publicações <p@site.test>", SUPPORT_EMAIL: "suporte@site.test",
     CATALOG_JSON: JSON.stringify([{ slug: SLUG, title: "Especialista SES - Fonoaudiologia", priceCents: 4990, files: [{ key: "fono/vol1.pdf", name: "Volume 1" }, { key: "fono/vol2.pdf", name: "Volume 2" }] }])
   },
@@ -72,7 +72,7 @@ const mf = new Miniflare({
 await mf.ready;
 const db = await mf.getD1Database("DB");
 for (const s of SCHEMA.replace(/^--.*$/gm, "").split(";").map((x) => x.trim()).filter(Boolean)) await db.prepare(s).run();
-const r2 = await mf.getR2Bucket("FILES");
+const r2 = await mf.getR2Bucket("BUCKET");
 await r2.put("fono/vol1.pdf", PDF); await r2.put("fono/vol2.pdf", PDF);
 
 const assinar = (id) => {
@@ -116,7 +116,11 @@ try {
   await p.waitForTimeout(300);
   ok("C. e-mail inválido é barrado antes de chamar o Worker", (await p.isVisible("#erroCompra")) && chamadas.length === 0);
 
-  await p.fill("#emailCompra", "comprador@exemplo.com");
+  await p.fill("#emailCompra", "comprador@exemplo.com"); await p.fill("#emailConfirmacao", "comprador@exemplo.co"); await p.click("#formCompra button");
+  await p.waitForTimeout(300);
+  ok("C. e-mails diferentes nos dois campos: mensagem clara e nenhuma chamada ao Worker", /não conferem/.test(await p.textContent("#erroCompra")) && chamadas.length === 0);
+
+  await p.fill("#emailConfirmacao", "COMPRADOR@exemplo.com");
   await Promise.all([p.waitForURL(/mp\.test\/pagar\//, { timeout: 8000 }), p.click("#formCompra button")]);
   ok("D. e-mail válido leva ao Checkout Pro", /mp\.test\/pagar\/1$/.test(p.url()), p.url());
   const corpoEnviado = JSON.parse(chamadas[0].postData());
@@ -161,9 +165,25 @@ try {
   await ctx3.route(`${API}/api/checkout`, (rota) => rota.fulfill({ status: 502, contentType: "application/json", headers: { "access-control-allow-origin": SITE }, body: JSON.stringify({ erro: "falha_no_checkout" }) }));
   const h = await ctx3.newPage();
   await h.goto(`${SITE}/catalogo/#/produto/${SLUG}`, { waitUntil: "load" }); await h.waitForSelector("#formCompra");
-  await h.fill("#emailCompra", "outro@exemplo.com"); await h.click("#formCompra button"); await h.waitForTimeout(600);
+  await h.fill("#emailCompra", "outro@exemplo.com"); await h.fill("#emailConfirmacao", "outro@exemplo.com"); await h.click("#formCompra button"); await h.waitForTimeout(600);
   ok("H. erro do Worker: mensagem clara, botão reativado, sem redirecionamento", (await h.isVisible("#erroCompra")) && !(await h.isDisabled("#formCompra button")) && h.url().includes("/catalogo/"));
   await ctx3.close();
+
+  /* ===== H2. Limite de tentativas: mensagem própria ===== */
+  const ctx4 = await navegador.newContext({ viewport: { width: 1280, height: 900 } });
+  await ctx4.addInitScript((api) => { window.CHECKOUT_API = api; }, API);
+  await ctx4.route(`${API}/api/checkout`, (rota) => rota.fulfill({ status: 429, contentType: "application/json", headers: { "access-control-allow-origin": SITE, "retry-after": "60" }, body: JSON.stringify({ erro: "muitas_tentativas" }) }));
+  const h2 = await ctx4.newPage();
+  await h2.goto(`${SITE}/catalogo/#/produto/${SLUG}`, { waitUntil: "load" }); await h2.waitForSelector("#formCompra");
+  await h2.fill("#emailCompra", "x@exemplo.com"); await h2.fill("#emailConfirmacao", "x@exemplo.com"); await h2.click("#formCompra button"); await h2.waitForTimeout(500);
+  ok("H2. resposta 429: mensagem sobre muitas tentativas e botão reativado", /Muitas tentativas/.test(await h2.textContent("#erroCompra")) && !(await h2.isDisabled("#formCompra button")));
+  await ctx4.close();
+
+  /* ===== H3. O Worker recusa o checkout feito de outra origem (proteção real, sem simulação) ===== */
+  const direto = await fetch(`${API}/api/checkout`, { method: "POST", headers: { "Content-Type": "application/json", Origin: "https://malicioso.test" }, body: JSON.stringify({ slug: SLUG, email: "a@exemplo.com" }) });
+  const semOrigin = await fetch(`${API}/api/checkout`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ slug: SLUG, email: "a@exemplo.com" }) });
+  const texto = await fetch(`${API}/api/checkout`, { method: "POST", headers: { "Content-Type": "text/plain", Origin: SITE }, body: JSON.stringify({ slug: SLUG, email: "a@exemplo.com" }) });
+  ok("H3. Worker real: outra origem 403, sem Origin 403, text/plain 415", direto.status === 403 && semOrigin.status === 403 && texto.status === 415, `${direto.status}/${semOrigin.status}/${texto.status}`);
 
   /* ===== I. Celular ===== */
   const cel = await navegador.newContext({ ...devices["iPhone 13"] });

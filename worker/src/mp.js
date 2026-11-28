@@ -1,4 +1,4 @@
-import { boolVar, hmacSha256Hex, timingSafeEqual } from "./util.js";
+import { boolVar, hmacSha256Hex, intVar, now, timingSafeEqual } from "./util.js";
 
 const API = "https://api.mercadopago.com";
 
@@ -10,7 +10,8 @@ const tiposExcluidos = (env) => {
   return excluidos.map((id) => ({ id }));
 };
 
-/* Cria a preferência de pagamento. O valor vem do catálogo do servidor. */
+/* Cria a preferência de pagamento. O valor vem do catálogo do servidor.
+   Parcelamento: condições padrão do Mercado Pago (nenhum número de parcelas é imposto). */
 export const criarPreferencia = async (env, { pedido, produto }) => {
   const corpo = {
     items: [
@@ -32,7 +33,7 @@ export const criarPreferencia = async (env, { pedido, produto }) => {
     },
     auto_return: "approved",
     binary_mode: false,
-    payment_methods: { excluded_payment_types: tiposExcluidos(env), installments: 12 }
+    payment_methods: { excluded_payment_types: tiposExcluidos(env) }
   };
 
   const resposta = await fetch(`${API}/checkout/preferences`, {
@@ -61,8 +62,19 @@ export const consultarPagamento = async (env, paymentId) => {
   return resposta.json();
 };
 
+/* Reconciliação: busca no Mercado Pago os pagamentos de um pedido (external_reference). */
+export const buscarPagamentos = async (env, orderId) => {
+  const url = `${API}/v1/payments/search?external_reference=${encodeURIComponent(orderId)}&sort=date_created&criteria=asc&limit=20`;
+  const resposta = await fetch(url, { headers: { Authorization: `Bearer ${env.MP_ACCESS_TOKEN}` } });
+  if (!resposta.ok) throw new Error(`Falha na busca de pagamentos (HTTP ${resposta.status})`);
+  const dados = await resposta.json();
+  return Array.isArray(dados.results) ? dados.results : [];
+};
+
 /* Validação da assinatura do webhook (cabeçalho x-signature):
-   manifesto = "id:<data.id>;request-id:<x-request-id>;ts:<ts>;" assinado com HMAC-SHA256. */
+   manifesto = "id:<data.id>;request-id:<x-request-id>;ts:<ts>;" assinado com HMAC-SHA256.
+   Além do HMAC, o timestamp assinado precisa estar dentro da janela de tolerância
+   (WEBHOOK_TOLERANCE_SECONDS, padrão 900 s), o que impede a reutilização de notificações antigas. */
 export const validarAssinatura = async (env, request, url) => {
   const cabecalho = request.headers.get("x-signature") || "";
   const requestId = request.headers.get("x-request-id") || "";
@@ -84,5 +96,13 @@ export const validarAssinatura = async (env, request, url) => {
   manifesto += `ts:${ts};`;
 
   const esperado = await hmacSha256Hex(env.MP_WEBHOOK_SECRET, manifesto);
-  return timingSafeEqual(esperado, v1);
+  const assinaturaOk = timingSafeEqual(esperado, v1);
+
+  // ts em segundos ou milissegundos
+  const bruto = Number(ts);
+  const segundos = bruto > 1e11 ? Math.floor(bruto / 1000) : bruto;
+  const tolerancia = intVar(env.WEBHOOK_TOLERANCE_SECONDS, 900);
+  const recente = Number.isFinite(segundos) && Math.abs(now() - segundos) <= tolerancia;
+
+  return assinaturaOk && recente;
 };

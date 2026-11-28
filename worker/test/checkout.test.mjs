@@ -1,118 +1,22 @@
+/* Regressão do checkout: criação do pedido, webhook, entrega e download (comportamentos originais,
+   adaptados às correções finais). Cenários novos (limites, disputas, recuperação, retenção) ficam
+   em robustez.test.mjs. */
 import assert from "node:assert/strict";
-import { createHmac } from "node:crypto";
 import { readFileSync } from "node:fs";
 import { after, before, describe, test } from "node:test";
-import { Miniflare } from "miniflare";
+import {
+  PDF, SCHEMA, SITE, assinar, emailsPara, iniciar, novoPedido, pagamento, pedidoNoBanco,
+  linksDoPedido, postJson, req, tokenDoEmail, webhook
+} from "./helpers.mjs";
 
-const SEGREDO = "segredo-do-webhook-de-teste";
-const TOKEN_MP = "TEST-token-de-teste";
-const SCHEMA = readFileSync(new URL("../schema.sql", import.meta.url), "utf8");
-const PDF = new TextEncoder().encode("%PDF-1.4 conteudo de teste do volume");
-
-const CATALOGO = [
-  { slug: "livro-teste", title: "Livro de Teste", priceCents: 4990, files: [{ key: "livro-teste/vol1.pdf", name: "Volume 1" }, { key: "livro-teste/vol2.pdf", name: "Volume 2" }] },
-  { slug: "sem-arquivo", title: "Sem arquivo", priceCents: 1000, files: [] },
-  { slug: "sem-preco", title: "Sem preço", priceCents: 0, files: [{ key: "x.pdf", name: "x" }] }
-];
-
-/* ---------- Mercado Pago e Resend simulados ---------- */
-const novoMock = () => ({ preferencias: [], pagamentos: new Map(), emails: [], consultas: [], emailFalha: false, seq: 0 });
-const criarSaida = (mock) => async (request) => {
-  const url = new URL(request.url);
-  const auth = request.headers.get("authorization");
-  if (url.host === "api.mercadopago.com" && url.pathname === "/checkout/preferences") {
-    assert.equal(auth, `Bearer ${TOKEN_MP}`);
-    const corpo = await request.json();
-    const n = ++mock.seq;
-    mock.preferencias.push({ corpo, cabecalhos: Object.fromEntries(request.headers) });
-    return Response.json({ id: `pref-${n}`, init_point: `https://mp.test/pagar/${n}`, sandbox_init_point: `https://sandbox.mp.test/pagar/${n}` });
-  }
-  if (url.host === "api.mercadopago.com" && url.pathname.startsWith("/v1/payments/")) {
-    assert.equal(auth, `Bearer ${TOKEN_MP}`);
-    const id = url.pathname.split("/").pop();
-    mock.consultas.push(id);
-    const p = mock.pagamentos.get(id);
-    return p ? Response.json(p) : new Response("{}", { status: 404 });
-  }
-  if (url.host === "api.resend.com" && url.pathname === "/emails") {
-    const corpo = await request.json();
-    if (mock.emailFalha) return new Response("erro", { status: 500 });
-    mock.emails.push(corpo);
-    return Response.json({ id: "email-ok" });
-  }
-  return new Response(`host não simulado: ${url.host}`, { status: 599 });
-};
-
-const iniciar = async (extra = {}, mock = novoMock()) => {
-  const mf = new Miniflare({
-    modules: true,
-    scriptPath: new URL("../src/index.js", import.meta.url).pathname,
-    modulesRoot: new URL("../src", import.meta.url).pathname,
-    modulesRules: [{ type: "ESModule", include: ["**/*.js"] }],
-    compatibilityDate: "2025-06-01",
-    d1Databases: { DB: "test-db" },
-    r2Buckets: { FILES: "test-files" },
-    bindings: {
-      MP_ACCESS_TOKEN: TOKEN_MP, MP_WEBHOOK_SECRET: SEGREDO, RESEND_API_KEY: "re_teste",
-      SITE_ORIGIN: "https://site.test", WORKER_ORIGIN: "https://worker.test",
-      ENABLE_PIX: "true", MP_ENV: "test", LINK_TTL_HOURS: "168", MAX_DOWNLOADS: "2",
-      EMAIL_FROM: "Publicações <pedidos@site.test>", SUPPORT_EMAIL: "suporte@site.test",
-      CATALOG_JSON: JSON.stringify(CATALOGO), ...extra
-    },
-    outboundService: criarSaida(mock)
-  });
-  await mf.ready;
-  const db = await mf.getD1Database("DB");
-  for (const stmt of SCHEMA.replace(/^--.*$/gm, "").split(";").map((s) => s.trim()).filter(Boolean)) await db.prepare(stmt).run();
-  const r2 = await mf.getR2Bucket("FILES");
-  await r2.put("livro-teste/vol1.pdf", PDF);
-  await r2.put("livro-teste/vol2.pdf", PDF);
-  return { mf, db, r2, mock };
-};
-
-const req = (mf, caminho, init = {}) => mf.dispatchFetch(`https://worker.test${caminho}`, init);
-const postJson = (mf, caminho, corpo, cabecalhos = {}) =>
-  req(mf, caminho, { method: "POST", headers: { "Content-Type": "application/json", ...cabecalhos }, body: JSON.stringify(corpo) });
-
-const assinar = (dataId, { ts = String(Date.now()), requestId = "req-1", segredo = SEGREDO } = {}) => {
-  const id = /^[a-z0-9]+$/i.test(dataId) ? dataId.toLowerCase() : dataId;
-  const v1 = createHmac("sha256", segredo).update(`id:${id};request-id:${requestId};ts:${ts};`).digest("hex");
-  return { "x-signature": `ts=${ts},v1=${v1}`, "x-request-id": requestId };
-};
-
-const webhook = (mf, paymentId, opcoes = {}) =>
-  req(mf, `/webhook/mercadopago?data.id=${paymentId}&type=payment`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json", ...assinar(opcoes.assinarComo ?? paymentId, opcoes) },
-    body: JSON.stringify({ action: "payment.updated", data: { id: paymentId } })
-  });
-
-let contador = 0;
-const novoPedido = async (ctx, slug = "livro-teste") => {
-  const email = `cliente${++contador}@exemplo.com`;
-  const r = await postJson(ctx.mf, "/api/checkout", { slug, email });
-  assert.equal(r.status, 200, await r.clone().text());
-  const pref = ctx.mock.preferencias.at(-1).corpo;
-  return { email, orderId: pref.external_reference, resposta: await r.json(), pref };
-};
-const pagamento = (ctx, orderId, { id = `pay${++contador}`, status = "approved", valor = 49.9, moeda = "BRL" } = {}) => {
-  const p = { id, status, status_detail: "teste", transaction_amount: valor, currency_id: moeda, external_reference: orderId };
-  ctx.mock.pagamentos.set(String(id), p);
-  return p;
-};
-const pedidoNoBanco = (ctx, id) => ctx.db.prepare("SELECT * FROM orders WHERE id = ?").bind(id).first();
-const emailsPara = (ctx, email) => ctx.mock.emails.filter((e) => e.to.includes(email));
-const tokenDoEmail = (email) => email.text.match(/\/d\/([\w-]+)\/0/)[1];
-
-describe("checkout e entrega — Mercado Pago Checkout Pro", () => {
+describe("checkout e entrega — regressão (Mercado Pago Checkout Pro)", () => {
   let ctx;
   before(async () => { ctx = await iniciar(); });
   after(async () => { await ctx.mf.dispose(); });
 
   /* ===== Catálogo e criação do checkout ===== */
   test("catálogo público lista só produtos com preço e arquivo e não expõe chaves de arquivo", async () => {
-    const r = await req(ctx.mf, "/api/catalogo");
-    const dados = await r.json();
+    const dados = await (await req(ctx.mf, "/api/catalogo")).json();
     assert.deepEqual(dados.produtos.map((p) => p.slug), ["livro-teste"]);
     assert.equal(dados.produtos[0].priceCents, 4990);
     assert.match(dados.produtos[0].price, /49,90/);
@@ -120,7 +24,7 @@ describe("checkout e entrega — Mercado Pago Checkout Pro", () => {
   });
 
   test("checkout usa o preço do servidor e ignora qualquer preço enviado pelo cliente", async () => {
-    const email = `adulterador${++contador}@exemplo.com`;
+    const email = `adulterador@exemplo.com`;
     const r = await postJson(ctx.mf, "/api/checkout", { slug: "livro-teste", email, price: 1, priceCents: 1, unit_price: 0.01, amount: 1 });
     assert.equal(r.status, 200);
     const { corpo, cabecalhos } = ctx.mock.preferencias.at(-1);
@@ -129,7 +33,7 @@ describe("checkout e entrega — Mercado Pago Checkout Pro", () => {
     assert.equal(corpo.items[0].quantity, 1);
     assert.equal(corpo.payer.email, email);
     assert.equal(corpo.notification_url, "https://worker.test/webhook/mercadopago");
-    assert.equal(corpo.back_urls.success, "https://site.test/pedido/?status=success");
+    assert.equal(corpo.back_urls.success, `${SITE}/pedido/?status=success`);
     assert.equal(cabecalhos["x-idempotency-key"], corpo.external_reference);
     const pedido = await pedidoNoBanco(ctx, corpo.external_reference);
     assert.equal(pedido.amount_cents, 4990);
@@ -137,14 +41,17 @@ describe("checkout e entrega — Mercado Pago Checkout Pro", () => {
     assert.equal((await r.json()).url.startsWith("https://sandbox.mp.test/"), true, "em MP_ENV=test usa o endereço de homologação");
   });
 
-  test("somente cartão de crédito e Pix: demais meios excluídos; Pix pode ser desligado", async () => {
+  test("somente cartão de crédito e Pix; Pix pode ser desligado; nenhum parcelamento é imposto", async () => {
     await novoPedido(ctx);
-    const excl = ctx.mock.preferencias.at(-1).corpo.payment_methods.excluded_payment_types.map((t) => t.id);
+    const prefs = ctx.mock.preferencias.at(-1).corpo;
+    const excl = prefs.payment_methods.excluded_payment_types.map((t) => t.id);
     for (const tipo of ["ticket", "atm", "debit_card", "prepaid_card"]) assert.ok(excl.includes(tipo), tipo);
     assert.ok(!excl.includes("credit_card") && !excl.includes("bank_transfer"), "cartão e Pix não podem ser excluídos");
+    assert.ok(!("installments" in prefs.payment_methods), "nenhum número de parcelas pode ser imposto (condições padrão do Mercado Pago)");
+    assert.ok(!JSON.stringify(prefs).includes("installments"), "installments não pode aparecer em lugar algum da preferência");
 
     const semPix = await iniciar({ ENABLE_PIX: "false" });
-    await semPix.mf.dispatchFetch("https://worker.test/api/checkout", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ slug: "livro-teste", email: "a@exemplo.com" }) });
+    await postJson(semPix.mf, "/api/checkout", { slug: "livro-teste", email: "a@exemplo.com" });
     const exclSemPix = semPix.mock.preferencias.at(-1).corpo.payment_methods.excluded_payment_types.map((t) => t.id);
     assert.ok(exclSemPix.includes("bank_transfer"), "Pix deve ser excluído quando ENABLE_PIX=false");
     assert.ok(!exclSemPix.includes("credit_card"));
@@ -157,12 +64,13 @@ describe("checkout e entrega — Mercado Pago Checkout Pro", () => {
     for (const slug of ["nao-existe", "sem-arquivo", "sem-preco", ""]) {
       assert.equal((await postJson(ctx.mf, "/api/checkout", { slug, email: "ok@exemplo.com" })).status, 404, slug);
     }
-    assert.equal((await req(ctx.mf, "/api/checkout", { method: "POST", body: "isto não é json" })).status, 400);
+    const jsonInvalido = await req(ctx.mf, "/api/checkout", { method: "POST", headers: { "Content-Type": "application/json", Origin: SITE }, body: "isto não é json" });
+    assert.equal(jsonInvalido.status, 400);
   });
 
   test("CORS só libera a origem do site", async () => {
-    const ok = await req(ctx.mf, "/api/checkout", { method: "OPTIONS", headers: { Origin: "https://site.test" } });
-    assert.equal(ok.headers.get("access-control-allow-origin"), "https://site.test");
+    const ok = await req(ctx.mf, "/api/checkout", { method: "OPTIONS", headers: { Origin: SITE } });
+    assert.equal(ok.headers.get("access-control-allow-origin"), SITE);
     const negado = await req(ctx.mf, "/api/checkout", { method: "OPTIONS", headers: { Origin: "https://malicioso.test" } });
     assert.equal(negado.headers.get("access-control-allow-origin"), null);
   });
@@ -172,8 +80,7 @@ describe("checkout e entrega — Mercado Pago Checkout Pro", () => {
     const { orderId, email } = await novoPedido(ctx);
     pagamento(ctx, orderId, { id: "pagforjado" });
     const antes = ctx.mock.consultas.length;
-    const semAssinatura = await req(ctx.mf, "/webhook/mercadopago?data.id=pagforjado&type=payment", { method: "POST", body: "{}" });
-    assert.equal(semAssinatura.status, 401);
+    assert.equal((await req(ctx.mf, "/webhook/mercadopago?data.id=pagforjado&type=payment", { method: "POST", body: "{}" })).status, 401);
     assert.equal((await webhook(ctx.mf, "pagforjado", { segredo: "outro-segredo" })).status, 401);
     assert.equal((await webhook(ctx.mf, "pagforjado", { assinarComo: "outropagamento" })).status, 401);
     const adulterada = await req(ctx.mf, "/webhook/mercadopago?data.id=pagforjado&type=payment", { method: "POST", headers: { "x-signature": "ts=1,v1=abc", "x-request-id": "r" }, body: "{}" });
@@ -197,8 +104,8 @@ describe("checkout e entrega — Mercado Pago Checkout Pro", () => {
     const enviados = emailsPara(ctx, email);
     assert.equal(enviados.length, 1);
     assert.match(enviados[0].subject, /Livro de Teste/);
-    assert.match(enviados[0].text, /https:\/\/worker\.test\/d\/[\w-]{40,}\/0/);
-    assert.match(enviados[0].text, /https:\/\/worker\.test\/d\/[\w-]{40,}\/1/);
+    assert.match(enviados[0].text, /https:\/\/arquivos\.exemplo\.test\/d\/[\w-]{43}\/0/);
+    assert.match(enviados[0].text, /https:\/\/arquivos\.exemplo\.test\/d\/[\w-]{43}\/1/);
     assert.equal(enviados[0].reply_to, "suporte@site.test");
   });
 
@@ -211,11 +118,12 @@ describe("checkout e entrega — Mercado Pago Checkout Pro", () => {
     const novo = await novoPedido(ctx);
     const p2 = pagamento(ctx, novo.orderId);
     const respostas = await Promise.all(Array.from({ length: 6 }, () => webhook(ctx.mf, p2.id)));
-    assert.ok(respostas.every((r) => r.status === 200));
+    assert.ok(respostas.every((r) => [200, 503].includes(r.status)), "simultâneos respondem 200 ou 503 (entrega em andamento), nunca 5xx de erro");
+    assert.ok(respostas.some((r) => r.status === 200));
+    await webhook(ctx.mf, p2.id); // repetição final
     assert.equal(emailsPara(ctx, email).length, 1, "repetição sequencial");
     assert.equal(emailsPara(ctx, novo.email).length, 1, "webhooks simultâneos");
-    const { n } = await ctx.db.prepare("SELECT COUNT(*) AS n FROM download_links WHERE order_id = ?").bind(novo.orderId).first();
-    assert.equal(n, 1);
+    assert.equal((await linksDoPedido(ctx, novo.orderId)).length, 1);
   });
 
   test("só entrega pagamento efetivamente aprovado: pendente, em análise e rejeitado não liberam nada", async () => {
@@ -230,7 +138,7 @@ describe("checkout e entrega — Mercado Pago Checkout Pro", () => {
 
   test("pendente e depois aprovado entrega; rejeitado e nova tentativa aprovada também entrega", async () => {
     const a = await novoPedido(ctx);
-    const pa = pagamento(ctx, a.orderId, { id: `p${++contador}`, status: "pending" });
+    const pa = pagamento(ctx, a.orderId, { status: "pending" });
     await webhook(ctx.mf, pa.id);
     assert.equal((await pedidoNoBanco(ctx, a.orderId)).status, "pending");
     pa.status = "approved";
@@ -264,17 +172,20 @@ describe("checkout e entrega — Mercado Pago Checkout Pro", () => {
     assert.equal((await webhook(ctx.mf, "pagamentoinexistente")).status, 200);
   });
 
-  test("segundo pagamento aprovado para o mesmo pedido não gera segunda entrega", async () => {
+  test("segundo pagamento aprovado para o mesmo pedido não gera segunda entrega e vai para análise", async () => {
     const { orderId, email } = await novoPedido(ctx);
     const p1 = pagamento(ctx, orderId);
     const p2 = pagamento(ctx, orderId);
     await webhook(ctx.mf, p1.id);
     await webhook(ctx.mf, p2.id);
     assert.equal(emailsPara(ctx, email).length, 1);
-    assert.equal((await pedidoNoBanco(ctx, orderId)).payment_id, p1.id);
+    const pedido = await pedidoNoBanco(ctx, orderId);
+    assert.equal(pedido.payment_id, p1.id);
+    assert.equal(pedido.review_status, "needs_review");
+    assert.equal(pedido.review_reason, "pagamento_duplicado");
   });
 
-  test("falha no envio do e-mail: webhook responde 5xx (para o Mercado Pago repetir) e a reentrega funciona, revogando o link anterior", async () => {
+  test("falha no envio do e-mail: webhook responde 5xx e a reentrega reaproveita o MESMO link, sem duplicar", async () => {
     const { orderId, email } = await novoPedido(ctx);
     const p = pagamento(ctx, orderId);
     ctx.mock.emailFalha = true;
@@ -283,18 +194,20 @@ describe("checkout e entrega — Mercado Pago Checkout Pro", () => {
     const falhou = await pedidoNoBanco(ctx, orderId);
     assert.equal(falhou.status, "paid");
     assert.equal(falhou.delivered_at, null);
+    const antes = await linksDoPedido(ctx, orderId);
     assert.equal((await webhook(ctx.mf, p.id)).status, 200);
     assert.equal(emailsPara(ctx, email).length, 1);
-    const { ativos } = await ctx.db.prepare("SELECT COUNT(*) AS ativos FROM download_links WHERE order_id = ? AND revoked = 0").bind(orderId).first();
-    assert.equal(ativos, 1, "apenas o link da entrega bem-sucedida permanece ativo");
+    const depois = await linksDoPedido(ctx, orderId);
+    assert.equal(depois.length, 1, "um único link por pedido");
+    assert.equal(depois[0].token_hash, antes[0].token_hash, "o link é o mesmo da tentativa anterior");
+    assert.equal(depois[0].revoked, 0);
     assert.ok((await pedidoNoBanco(ctx, orderId)).delivered_at);
   });
 
   /* ===== Download protegido ===== */
   test("link de download entrega o PDF com cabeçalhos de proteção e respeita o limite de downloads", async () => {
     const { orderId, email } = await novoPedido(ctx);
-    const p = pagamento(ctx, orderId);
-    await webhook(ctx.mf, p.id);
+    await webhook(ctx.mf, pagamento(ctx, orderId).id);
     const token = tokenDoEmail(emailsPara(ctx, email)[0]);
     const r1 = await req(ctx.mf, `/d/${token}/0`);
     assert.equal(r1.status, 200);
@@ -313,6 +226,7 @@ describe("checkout e entrega — Mercado Pago Checkout Pro", () => {
     const token = tokenDoEmail(emailsPara(ctx, email)[0]);
     assert.equal((await req(ctx.mf, `/d/${"x".repeat(43)}/0`)).status, 404, "token inventado");
     assert.equal((await req(ctx.mf, `/d/${token.slice(0, -1)}A/0`)).status, 404, "token adulterado");
+    assert.equal((await req(ctx.mf, `/d/${token}0/0`)).status, 404, "token com tamanho errado não casa a rota");
     assert.equal((await req(ctx.mf, `/d/${token}/9`)).status, 404, "índice de arquivo inexistente");
     await ctx.db.prepare("UPDATE download_links SET expires_at = ? WHERE order_id = ?").bind(1, orderId).run();
     assert.equal((await req(ctx.mf, `/d/${token}/0`)).status, 410, "link expirado");
@@ -329,24 +243,22 @@ describe("checkout e entrega — Mercado Pago Checkout Pro", () => {
     await ctx.r2.put("livro-teste/vol1.pdf", PDF);
   });
 
-  /* ===== Reembolso, cancelamento e estorno ===== */
-  test("reembolso e estorno revogam o acesso imediatamente", async () => {
-    for (const status of ["refunded", "charged_back"]) {
-      const { orderId, email } = await novoPedido(ctx);
-      const p = pagamento(ctx, orderId);
-      await webhook(ctx.mf, p.id);
-      const token = tokenDoEmail(emailsPara(ctx, email)[0]);
-      assert.equal((await req(ctx.mf, `/d/${token}/0`)).status, 200, "antes do reembolso");
-      p.status = status;
-      assert.equal((await webhook(ctx.mf, p.id)).status, 200);
-      assert.equal((await pedidoNoBanco(ctx, orderId)).status, status);
-      assert.equal((await req(ctx.mf, `/d/${token}/1`)).status, 410, `depois de ${status}`);
-      await webhook(ctx.mf, p.id); // repetição não reabre o acesso
-      assert.equal((await req(ctx.mf, `/d/${token}/1`)).status, 410);
-    }
+  /* ===== Reembolso total e cancelamento ===== */
+  test("reembolso total revoga o acesso imediatamente e a repetição não o reabre", async () => {
+    const { orderId, email } = await novoPedido(ctx);
+    const p = pagamento(ctx, orderId);
+    await webhook(ctx.mf, p.id);
+    const token = tokenDoEmail(emailsPara(ctx, email)[0]);
+    assert.equal((await req(ctx.mf, `/d/${token}/0`)).status, 200, "antes do reembolso");
+    p.status = "refunded";
+    assert.equal((await webhook(ctx.mf, p.id)).status, 200);
+    assert.equal((await pedidoNoBanco(ctx, orderId)).status, "refunded");
+    assert.equal((await req(ctx.mf, `/d/${token}/1`)).status, 410);
+    await webhook(ctx.mf, p.id);
+    assert.equal((await req(ctx.mf, `/d/${token}/1`)).status, 410);
   });
 
-  test("cancelamento antes do pagamento encerra o pedido e uma aprovação tardia não reativa", async () => {
+  test("cancelamento antes do pagamento encerra o pedido e uma aprovação tardia não reativa nem some: vai para análise", async () => {
     const { orderId, email } = await novoPedido(ctx);
     const p = pagamento(ctx, orderId, { status: "cancelled" });
     await webhook(ctx.mf, p.id);
@@ -354,7 +266,10 @@ describe("checkout e entrega — Mercado Pago Checkout Pro", () => {
     p.status = "approved";
     await webhook(ctx.mf, p.id);
     assert.equal(emailsPara(ctx, email).length, 0);
-    assert.equal((await pedidoNoBanco(ctx, orderId)).status, "cancelled");
+    const pedido = await pedidoNoBanco(ctx, orderId);
+    assert.equal(pedido.status, "cancelled");
+    assert.equal(pedido.review_status, "needs_review", "dinheiro aprovado em pedido encerrado precisa de análise manual");
+    assert.equal(pedido.review_reason, "pagamento_aprovado_em_pedido_encerrado");
   });
 
   test("pedido pago e depois cancelado revoga o acesso", async () => {
@@ -376,7 +291,7 @@ describe("checkout e entrega — Mercado Pago Checkout Pro", () => {
   });
 
   test("nenhum segredo ou token real aparece nos arquivos do Worker", () => {
-    const arquivos = ["../wrangler.toml", "../catalog.example.json", "../src/index.js", "../src/mp.js", "../src/email.js", "../src/util.js", "../src/catalog.js", "../package.json"];
+    const arquivos = ["../wrangler.toml", "../catalog.example.json", "../src/index.js", "../src/mp.js", "../src/email.js", "../src/util.js", "../src/catalog.js", "../src/pedidos.js", "../src/manutencao.js", "../src/limite.js", "../package.json"];
     for (const a of arquivos) {
       const texto = readFileSync(new URL(a, import.meta.url), "utf8");
       assert.ok(!/APP_USR-[\w-]{10,}|TEST-[0-9a-f]{8,}-|re_[A-Za-z0-9]{20,}/.test(texto), `possível segredo em ${a}`);
