@@ -13,7 +13,7 @@ import pathlib
 import shutil
 
 RAIZ = pathlib.Path(__file__).resolve().parent.parent
-BASE = "https://accsconsultoria.github.io"
+BASE = "https://accsconsultoria.github.io"  # endereço técnico do GitHub Pages (não exibido ao visitante)
 DADOS = json.loads((RAIZ / "data/publicacoes.json").read_text(encoding="utf-8"))["publicacoes"]
 SAIDA = RAIZ / "produtos"
 
@@ -23,7 +23,7 @@ if SAIDA.exists():
 for p in DADOS:
     slug = p["slug"]
     nome = html.escape(p["nome"])
-    desc = html.escape(p.get("descricaoCurta") or "Material educacional da ACCS CONSULTORIA.")
+    desc = html.escape(p.get("descricaoCurta") or "Publicação digital para concursos públicos.")
     url = f"{BASE}/produtos/{slug}/"
     destino = f"../../catalogo/#/produto/{slug}"
     capa = p.get("capa") or ""
@@ -39,12 +39,12 @@ for p in DADOS:
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>{nome} — ACCS CONSULTORIA</title>
+  <title>{nome} — Catálogo de publicações</title>
   <meta name="description" content="{desc}">
   <link rel="canonical" href="{url}">
   <meta name="robots" content="index, follow">
   <meta property="og:type" content="product">
-  <meta property="og:site_name" content="ACCS CONSULTORIA">
+  <meta property="og:site_name" content="Publicações para concursos públicos">
   <meta property="og:title" content="{nome}">
   <meta property="og:description" content="{desc}">
   <meta property="og:url" content="{url}">

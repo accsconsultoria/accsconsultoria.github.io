@@ -1,5 +1,5 @@
 {
-  "_comoCadastrar": "Vitrine: cada publicação é apresentada e vendida pelo WhatsApp; não há checkout. Adicione um objeto por publicação em \"publicacoes\". Campos: slug (único, sem espaços), nome, categoria (id de CONFIGURACAO.categorias no index.html: ebooks, livros-digitais, pdfs, apostilas, cursos), autor, formato (formato de entrega), preco (vazio = \"Consulte valores pelo WhatsApp\"), descricaoCurta, descricaoCompleta, conteudo (lista de itens de conteúdo e benefícios), capa (ex.: assets/capas/nome.jpg), previa (ex.: previews/nome.pdf, somente prévia autorizada), destaque e lancamento (true/false).",
+  "_comoCadastrar": "Adicione um objeto por publicação em \"publicacoes\". A última publicação do arquivo é exibida como o lançamento mais recente. Campos: slug (único, sem espaços), nome, area (saude, administracao-publica, direito ou outras), tipo (ex.: Livro, Coleção), concurso, cargo, banca, volumes, capitulos, questoes, paginas, figuras (números; deixe de fora quando não houver), descricaoCurta, apresentacao (lista de parágrafos), sumarioTitulo e sumario (lista de {titulo, itens}), conteudo (lista de características), formato (formato de entrega), capa (ex.: assets/capas/nome.jpg, proporção 3:4), previa (ex.: previews/nome.pdf, somente prévia autorizada), preco (opcional). Campos antigos (categoria, descricaoCompleta, destaque, lancamento) são mantidos por compatibilidade. Depois de editar, rode: python3 tools/gerar_paginas_produto.py",
   "publicacoes": [
     {
       "slug": "especialista-ses-fonoaudiologia",
@@ -20,7 +20,51 @@
       "capa": "assets/capas/especialista-ses-fonoaudiologia-v3.jpg",
       "previa": "",
       "destaque": false,
-      "lancamento": false
+      "lancamento": false,
+      "area": "saude",
+      "tipo": "Coleção",
+      "concurso": "SES-DF — Secretaria de Estado de Saúde do Distrito Federal",
+      "cargo": "Cargo 110 – Fonoaudiólogo",
+      "banca": "CEBRASPE",
+      "volumes": 7,
+      "questoes": 379,
+      "paginas": 328,
+      "apresentacao": [
+        "Uma coleção editorial de preparação especializada, desenvolvida para o concurso de Fonoaudiólogo da Secretaria de Estado de Saúde do Distrito Federal (SES-DF).",
+        "São 7 volumes, com 328 páginas de conteúdo teórico e questões comentadas, abrangendo áreas fundamentais da Fonoaudiologia.",
+        "A coleção combina conteúdo teórico organizado por disciplinas e 379 itens no formato Certo ou Errado, com comentários e explicações para aprofundar a compreensão dos assuntos e auxiliar na preparação para o perfil de cobrança do CEBRASPE."
+      ],
+      "sumarioTitulo": "Os 7 volumes",
+      "sumario": [
+        {
+          "titulo": "Fonoaudiologia em Saúde Coletiva",
+          "itens": 67
+        },
+        {
+          "titulo": "Linguagem",
+          "itens": 68
+        },
+        {
+          "titulo": "Distúrbios Neurológicos e Fonoaudiologia",
+          "itens": 55
+        },
+        {
+          "titulo": "Audição",
+          "itens": 49
+        },
+        {
+          "titulo": "Voz",
+          "itens": 48
+        },
+        {
+          "titulo": "Motricidade Orofacial",
+          "itens": 44
+        },
+        {
+          "titulo": "Fonoaudiologia Geral",
+          "itens": 48
+        }
+      ]
     },
     {
       "slug": "farmaceutico-bioquimico",
@@ -43,7 +87,45 @@
       "capa": "assets/capas/farmaceutico-bioquimico.jpg",
       "previa": "",
       "destaque": false,
-      "lancamento": false
+      "lancamento": false,
+      "area": "saude",
+      "tipo": "Livro",
+      "concurso": "SES-DF — Secretaria de Estado de Saúde do Distrito Federal",
+      "cargo": "Cargo 106 – Farmacêutico-Bioquímico",
+      "banca": "CEBRASPE",
+      "capitulos": 7,
+      "questoes": 622,
+      "paginas": 427,
+      "figuras": 96,
+      "apresentacao": [
+        "Uma obra editorial de preparação especializada, desenvolvida para o concurso de Farmacêutico-Bioquímico da Secretaria de Estado de Saúde do Distrito Federal (SES-DF).",
+        "São 427 páginas, organizadas em 7 capítulos, com conteúdo teórico didático, recursos visuais e questões comentadas, abrangendo áreas fundamentais da Farmácia.",
+        "A obra combina conteúdo teórico organizado por áreas de conhecimento e 622 itens no formato Certo ou Errado, com gabarito, comentários e explicações para aprofundar a compreensão dos assuntos e auxiliar na preparação para o perfil de cobrança do CEBRASPE."
+      ],
+      "sumarioTitulo": "Os 7 capítulos",
+      "sumario": [
+        {
+          "titulo": "Fundamentos da Profissão"
+        },
+        {
+          "titulo": "Assistência Farmacêutica"
+        },
+        {
+          "titulo": "Farmacologia"
+        },
+        {
+          "titulo": "Farmacotécnica"
+        },
+        {
+          "titulo": "Farmácia Hospitalar"
+        },
+        {
+          "titulo": "Vigilância Sanitária e Qualidade"
+        },
+        {
+          "titulo": "Revisão e Consolidação"
+        }
+      ]
     }
   ]
 }
