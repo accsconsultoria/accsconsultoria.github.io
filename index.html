@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=1280">
   <title>ACCS CONSULTORIA — Conteúdos digitais para aprendizado e prática</title>
   <meta name="description" content="Vitrine digital da ACCS CONSULTORIA: materiais educacionais em PDF, prévias autorizadas e atendimento direto pelo WhatsApp.">
   <meta name="author" content="ACCS CONSULTORIA">
@@ -119,7 +119,7 @@
     .topo-cta{padding:11px 18px;font-size:.85rem}
 
     /* Hero */
-    .hero{position:relative;min-height:100vh;display:flex;align-items:center;padding:130px 0 90px;overflow:hidden;isolation:isolate}
+    .hero{position:relative;min-height:min(100vh,920px);display:flex;align-items:center;padding:130px 0 90px;overflow:hidden;isolation:isolate}
     .hero-canvas{position:absolute;inset:0;width:100%;height:100%;z-index:-1;opacity:.95}
     .hero-orb{
       position:absolute;z-index:-2;width:min(70vw,620px);aspect-ratio:1;border-radius:50%;
@@ -182,8 +182,8 @@
     .bento-visual div:nth-child(3){width:48%;opacity:.35}
 
     /* Scrollytelling */
-    .story{height:300vh}
-    .story-sticky{position:sticky;top:0;height:100vh;display:flex;align-items:center;overflow:hidden}
+    .story{height:min(300vh,2700px)}
+    .story-sticky{position:sticky;top:0;height:min(100vh,900px);display:flex;align-items:center;overflow:hidden}
     .story-grid{display:grid;grid-template-columns:1fr 1.1fr;gap:70px;align-items:center;width:100%}
     .story-steps{display:grid;gap:14px;position:relative;padding-left:26px}
     .story-track{position:absolute;left:0;top:6px;bottom:6px;width:2px;background:var(--linha);border-radius:2px;overflow:hidden}
@@ -743,7 +743,7 @@
         ScrollTrigger.create({
           trigger: '#processo',
           start: 'top top',
-          end: '+=200%',
+          end: () => `+=${Math.min(window.innerHeight * 2, 1800)}`,
           pin: '.story-sticky',
           scrub: true,
           onUpdate: (self) => {
