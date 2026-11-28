@@ -11,7 +11,7 @@
   const CONFIG = {
     whatsapp: "https://wa.me/5561981594773",
     whatsappExibicao: "(61) 98159-4773",
-    email: "contato@accsconsultoria.com.br",
+    email: "consultoria.accs@gmail.com",
     local: "Brasília — Distrito Federal, Brasil",
     areas: [
       { id: "saude", nome: "Saúde" },
