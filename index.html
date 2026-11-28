@@ -119,7 +119,7 @@
     .topo-cta{padding:11px 18px;font-size:.85rem}
 
     /* Hero */
-    .hero{position:relative;min-height:min(100vh,920px);display:flex;align-items:center;padding:130px 0 90px;overflow:hidden;isolation:isolate}
+    .hero{position:relative;min-height:100vh;display:flex;align-items:center;padding:92px 0 36px;overflow:hidden;isolation:isolate}
     .hero-canvas{position:absolute;inset:0;width:100%;height:100%;z-index:-1;opacity:.95}
     .hero-orb{
       position:absolute;z-index:-2;width:min(70vw,620px);aspect-ratio:1;border-radius:50%;
@@ -131,12 +131,12 @@
       border:1px solid var(--linha);background:var(--vidro);color:var(--muted);
     }
     .hero-badge i{width:8px;height:8px;border-radius:50%;background:var(--cyan);box-shadow:0 0 12px var(--cyan)}
-    .hero-title{font-size:clamp(2.6rem,7.4vw,6.2rem);font-weight:800;margin:26px 0 24px;max-width:13ch}
+    .hero-title{font-size:clamp(2.6rem,min(6.6vw,9.4vh),5.6rem);font-weight:800;margin:26px 0 24px;max-width:11.5ch}
     .word{display:inline-block;overflow:hidden;vertical-align:top;padding-bottom:.08em;margin-right:.18em}
     .word>span{display:inline-block}
     .grad{background:linear-gradient(120deg,#A5B4FC 0%,var(--indigo) 35%,var(--cyan) 100%);-webkit-background-clip:text;background-clip:text;color:transparent}
     .hero-sub{font-size:clamp(1.02rem,1.6vw,1.22rem);color:var(--muted);max-width:52ch}
-    .hero-actions{display:flex;flex-wrap:wrap;gap:16px;margin-top:44px}
+    .hero-actions{display:flex;flex-wrap:wrap;gap:16px;margin-top:36px}
     .hero-actions .btn{padding:21px 40px;font-size:1.1rem;font-weight:600;letter-spacing:.01em}
     .hero-actions .btn-primario{
       box-shadow:0 0 0 1px rgba(255,255,255,.14) inset,0 18px 50px -10px rgba(99,102,241,.9),0 0 40px -6px rgba(6,182,212,.55);
@@ -151,7 +151,7 @@
       0%,100%{box-shadow:0 0 0 1px rgba(255,255,255,.14) inset,0 18px 50px -10px rgba(99,102,241,.9),0 0 40px -6px rgba(6,182,212,.55)}
       50%{box-shadow:0 0 0 1px rgba(255,255,255,.2) inset,0 22px 64px -8px rgba(99,102,241,1),0 0 64px 0 rgba(6,182,212,.75)}
     }
-    .hero-strip{display:flex;flex-wrap:wrap;gap:10px;margin-top:44px}
+    .hero-strip{display:flex;flex-wrap:wrap;gap:10px;margin-top:30px}
     .hero-strip span{padding:8px 12px;border-radius:10px;border:1px solid var(--linha);background:rgba(255,255,255,.02);color:var(--muted)}
 
     /* Seções */
@@ -331,11 +331,8 @@
       </button>
 
       <nav class="nav" id="nav" aria-label="Navegação principal">
-        <a href="#recursos">Recursos</a>
-        <a href="#processo">Como funciona</a>
-        <a href="#produtos">Produtos</a>
         <a href="catalogo/#/catalogo">Catálogo</a>
-        <a href="#contato">Contato</a>
+        <a href="https://wa.me/5561981594773?text=Ol%C3%A1!%20Tenho%20interesse%20nos%20materiais%20da%20ACCS%20CONSULTORIA." target="_blank" rel="noopener">Contato</a>
       </nav>
 
       <a class="btn btn-primario topo-cta magnetic" href="https://wa.me/5561981594773?text=Ol%C3%A1!%20Tenho%20interesse%20nos%20materiais%20da%20ACCS%20CONSULTORIA." target="_blank" rel="noopener">Falar no WhatsApp</a>
@@ -377,172 +374,8 @@
       </div>
     </section>
 
-    <!-- RECURSOS (BENTO) -->
-    <section class="secao" id="recursos" aria-labelledby="titulo-recursos">
-      <div class="container">
-        <div class="cabecalho reveal">
-          <span class="rotulo mono">01 — Recursos</span>
-          <h2 class="titulo-secao" id="titulo-recursos">Tudo o que você precisa para conhecer o material.</h2>
-          <p class="lead">Cada publicação traz descrição completa, formato de entrega e, quando autorizada, uma prévia para navegar antes de decidir.</p>
-        </div>
-
-        <div class="bento" id="bento">
-          <article class="bento-card c-1">
-            <div>
-              <span class="bento-ico" aria-hidden="true">◎</span>
-              <h3 style="margin-top:28px">Prévia antes da compra</h3>
-              <p>Navegue pelas páginas de prévia autorizada diretamente no site, com zoom e navegação, para avaliar o conteúdo antes de falar com o atendimento.</p>
-            </div>
-            <div class="bento-visual" aria-hidden="true"><div></div><div></div><div></div></div>
-          </article>
-
-          <article class="bento-card c-2">
-            <span class="bento-ico" aria-hidden="true">▤</span>
-            <div>
-              <h3>Material em PDF</h3>
-              <p>Formato de entrega indicado em cada publicação.</p>
-            </div>
-          </article>
-
-          <article class="bento-card c-3">
-            <span class="bento-ico" aria-hidden="true">⌘</span>
-            <div>
-              <h3>Artefato interativo</h3>
-              <p>Acesso a um artefato de resolução de questões, entregue individualmente.</p>
-            </div>
-          </article>
-
-          <article class="bento-card c-4">
-            <span class="bento-ico" aria-hidden="true">≡</span>
-            <div>
-              <h3>Questões por capítulo</h3>
-              <p>Conteúdo organizado por capítulo para estudo direcionado.</p>
-            </div>
-          </article>
-
-          <article class="bento-card c-5">
-            <span class="bento-ico" aria-hidden="true">✎</span>
-            <div>
-              <h3>Comentários e explicações</h3>
-              <p>Cada questão acompanha comentários e explicações.</p>
-            </div>
-          </article>
-
-          <article class="bento-card c-6">
-            <span class="bento-ico" aria-hidden="true">↗</span>
-            <div>
-              <h3>Favoritos e desempenho</h3>
-              <p>Histórico, favoritos e acompanhamento de desempenho.</p>
-            </div>
-          </article>
-        </div>
-      </div>
-    </section>
-
-    <!-- COMO FUNCIONA (SCROLLYTELLING) -->
-    <section class="story" id="processo" aria-labelledby="titulo-processo">
-      <div class="story-sticky">
-        <div class="container story-grid">
-          <div>
-            <span class="rotulo mono">02 — Como funciona</span>
-            <h2 class="titulo-secao" id="titulo-processo" style="margin-bottom:40px">Da escolha à entrega, em três passos.</h2>
-
-            <div class="story-steps">
-              <div class="story-track" aria-hidden="true"><span></span></div>
-              <div class="story-step ativo" data-passo="0">
-                <h3>Escolha o material</h3>
-                <p>Navegue pelo catálogo e conheça a descrição, o conteúdo e o formato de entrega.</p>
-              </div>
-              <div class="story-step" data-passo="1">
-                <h3>Fale pelo WhatsApp</h3>
-                <p>O botão já abre a conversa com a mensagem identificando o produto escolhido.</p>
-              </div>
-              <div class="story-step" data-passo="2">
-                <h3>Receba o material</h3>
-                <p>Após a confirmação do pagamento, o material é entregue manualmente pelo atendimento.</p>
-              </div>
-            </div>
-          </div>
-
-          <div class="story-stage" aria-hidden="true">
-            <div class="story-visual ativo" data-visual="0">
-              <span class="mono" style="color:var(--cyan)">Catálogo</span>
-              <h4>Conheça antes de decidir</h4>
-              <p style="color:var(--muted)">Descrição completa, conteúdo e benefícios, formato de entrega e prévia quando autorizada.</p>
-            </div>
-            <div class="story-visual" data-visual="1">
-              <span class="mono" style="color:var(--cyan)">WhatsApp</span>
-              <div class="bolha">Olá! Tenho interesse no produto escolhido. Gostaria de conhecer os valores e as condições de aquisição.</div>
-            </div>
-            <div class="story-visual" data-visual="2">
-              <span class="mono" style="color:var(--cyan)">Entrega</span>
-              <ul class="checklist">
-                <li>Pagamento confirmado</li>
-                <li>Material em PDF enviado</li>
-                <li>Link do artefato entregue</li>
-              </ul>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- PRODUTOS -->
-    <section class="secao" id="produtos" aria-labelledby="titulo-produtos">
-      <div class="container">
-        <div class="cabecalho reveal">
-          <span class="rotulo mono">03 — Produtos</span>
-          <h2 class="titulo-secao" id="titulo-produtos">Materiais disponíveis.</h2>
-          <p class="lead">Os valores são informados pelo atendimento. Escolha um material e fale diretamente com a equipe.</p>
-        </div>
-
-        <div class="planos" id="planos-grade" aria-live="polite">
-          <div class="aviso-box">Carregando materiais…</div>
-        </div>
-
-        <div class="ver-todos reveal">
-          <a class="btn magnetic" href="catalogo/#/catalogo">Ver catálogo completo</a>
-        </div>
-      </div>
-    </section>
-
-    <!-- CONTATO -->
-    <section class="secao" id="contato" aria-labelledby="titulo-contato" style="padding-top:40px">
-      <div class="container">
-        <div class="contato reveal">
-          <div>
-            <span class="rotulo mono">04 — Contato</span>
-            <h2 id="titulo-contato">Vamos conversar?</h2>
-            <p class="lead" style="margin-top:22px">Dúvidas sobre os materiais, valores e condições de aquisição podem ser enviadas pelo WhatsApp.</p>
-            <div style="margin-top:34px">
-              <a class="btn btn-primario magnetic" href="https://wa.me/5561981594773?text=Ol%C3%A1!%20Tenho%20interesse%20nos%20materiais%20da%20ACCS%20CONSULTORIA." target="_blank" rel="noopener">Comprar pelo WhatsApp</a>
-            </div>
-          </div>
-          <div class="contato-links">
-            <a href="https://wa.me/5561981594773" target="_blank" rel="noopener">WhatsApp <span>(61) 98159-4773</span></a>
-            <a href="mailto:contato@accsconsultoria.com.br">E-mail <span>contato@accsconsultoria.com.br</span></a>
-            <a href="https://instagram.com/accsconsultoria" target="_blank" rel="noopener">Instagram <span>@accsconsultoria</span></a>
-          </div>
-        </div>
-      </div>
-    </section>
   </main>
 
-  <footer class="rodape">
-    <div class="container rodape-interno">
-      <div class="marca" style="color:var(--texto)">
-        <span class="marca-sigla">ACCS</span>
-        <span>ACCS CONSULTORIA</span>
-      </div>
-      <nav aria-label="Rodapé">
-        <a href="#recursos">Recursos</a>
-        <a href="#produtos">Produtos</a>
-        <a href="catalogo/#/catalogo">Catálogo</a>
-        <a href="#contato">Contato</a>
-      </nav>
-      <span>© <span id="anoAtual"></span> ACCS CONSULTORIA · Brasília — DF</span>
-    </div>
-  </footer>
 
   <script type="module">
     import * as THREE from 'three';
@@ -557,7 +390,6 @@
     const pequeno = matchMedia('(max-width: 767px)').matches;
     const RÓTULOS = { ebooks: 'E-books', 'livros-digitais': 'Livros digitais', pdfs: 'PDFs', apostilas: 'Apostilas', cursos: 'Cursos' };
 
-    document.getElementById('anoAtual').textContent = new Date().getFullYear();
 
     /* ---------- Menu mobile ---------- */
     const menuBotao = document.getElementById('menuBotao');
@@ -738,34 +570,9 @@
         });
       });
 
-      gsap.from('.bento-card', {
-        opacity: 0, y: 50, duration: 0.9, ease: 'power3.out', stagger: 0.08,
-        scrollTrigger: { trigger: '#bento', start: 'top 82%', once: true }
-      });
 
       }
 
-      // Storytelling fixado: passos e cartões acompanham a rolagem
-      if (!reduzir && !pequeno) {
-        const passos = gsap.utils.toArray('.story-step');
-        const visuais = gsap.utils.toArray('.story-visual');
-        const barra = document.querySelector('.story-track span');
-        const marcar = (indice) => {
-          passos.forEach((el, k) => el.classList.toggle('ativo', k === indice));
-          visuais.forEach((el, k) => el.classList.toggle('ativo', k === indice));
-        };
-        ScrollTrigger.create({
-          trigger: '#processo',
-          start: 'top top',
-          end: () => `+=${Math.min(window.innerHeight * 2, 1800)}`,
-          pin: '.story-sticky',
-          scrub: true,
-          onUpdate: (self) => {
-            marcar(Math.min(passos.length - 1, Math.floor(self.progress * passos.length)));
-            gsap.set(barra, { scaleY: self.progress });
-          }
-        });
-      }
     }
 
     /* Animação de cartões de produto após carregamento */
@@ -822,7 +629,6 @@
       });
     });
 
-    carregarProdutos();
   </script>
 </body>
 </html>
