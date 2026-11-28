@@ -20,3 +20,13 @@ Site estático da ACCS CONSULTORIA (GitHub Pages).
 ## Visualizador de prévia
 
 Usa PDF.js 3.11.174, carregado do cdnjs somente quando uma prévia é aberta. Se a biblioteca não carregar, a página oferece o botão "Abrir prévia em nova aba".
+
+## Links compartilháveis dos produtos
+
+Cada publicação tem uma página própria em `produtos/<slug>/`, com título, descrição e capa para as prévias de WhatsApp, Facebook etc. Ela redireciona para a vitrine. Para compartilhar, use `https://accsconsultoria.github.io/produtos/<slug>/`.
+
+Depois de cadastrar ou alterar uma publicação em `data/publicacoes.json`, rode:
+
+    python3 tools/gerar_paginas_produto.py
+
+e envie a pasta `produtos/` junto com o restante.
