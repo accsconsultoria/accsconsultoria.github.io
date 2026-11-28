@@ -445,7 +445,7 @@
       geo.setAttribute('position', new THREE.BufferAttribute(posicao, 3));
       geo.setAttribute('color', new THREE.BufferAttribute(cor, 3));
       const pontos = new THREE.Points(geo, new THREE.PointsMaterial({
-        size: 0.03, vertexColors: true, transparent: true, opacity: 0.9, depthWrite: false
+        size: 0.04, vertexColors: true, transparent: true, opacity: 0.9, depthWrite: false
       }));
       const malha = new THREE.Mesh(
         new THREE.IcosahedronGeometry(1.02, 2),
@@ -468,6 +468,12 @@
         renderer.setSize(w, h, false);
         camera.aspect = w / h;
         camera.updateProjectionMatrix();
+        // Esfera ampliada: à direita em telas largas, limitada à largura em telas estreitas
+        const alturaVisivel = 2 * Math.tan((camera.fov * Math.PI) / 360) * camera.position.z;
+        const larguraVisivel = alturaVisivel * camera.aspect;
+        const largo = camera.aspect > 1.2;
+        grupo.scale.setScalar(largo ? 1.75 : Math.min(1.75, (larguraVisivel * 0.94) / 2));
+        grupo.position.set(largo ? Math.min(1.2, larguraVisivel / 2 - 1.75) : 0, 0, 0);
       };
       redimensionar();
       window.addEventListener('resize', redimensionar);
