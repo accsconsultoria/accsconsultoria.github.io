@@ -151,8 +151,6 @@
       0%,100%{box-shadow:0 0 0 1px rgba(255,255,255,.14) inset,0 18px 50px -10px rgba(99,102,241,.9),0 0 40px -6px rgba(6,182,212,.55)}
       50%{box-shadow:0 0 0 1px rgba(255,255,255,.2) inset,0 22px 64px -8px rgba(99,102,241,1),0 0 64px 0 rgba(6,182,212,.75)}
     }
-    .hero-strip{display:flex;flex-wrap:wrap;gap:10px;margin-top:30px}
-    .hero-strip span{padding:8px 12px;border-radius:10px;border:1px solid var(--linha);background:rgba(255,255,255,.02);color:var(--muted)}
 
     /* Seções */
     section{position:relative}
@@ -365,12 +363,6 @@
           <a class="btn magnetic" href="catalogo/#/catalogo">Explorar catálogo</a>
         </div>
 
-        <div class="hero-strip mono" aria-label="Diferenciais">
-          <span>Prévia antes da compra</span>
-          <span>Material em PDF</span>
-          <span>Atendimento direto</span>
-          <span>Entrega individual</span>
-        </div>
       </div>
     </section>
 
@@ -566,7 +558,7 @@
       entrada
         .from('.hero-badge', { opacity: 0, y: 12, duration: 0.6 })
         .from('.hero-title .word > span', { yPercent: 110, duration: 1.1, stagger: 0.07 }, '-=0.3')
-        .from('.hero-sub, .hero-actions, .hero-strip', { opacity: 0, y: 24, duration: 0.9, stagger: 0.12 }, '-=0.7');
+        .from('.hero-sub, .hero-actions', { opacity: 0, y: 24, duration: 0.9, stagger: 0.12 }, '-=0.7');
 
       // Revelações por rolagem
       gsap.utils.toArray('.reveal').forEach((el) => {
