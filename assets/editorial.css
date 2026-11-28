@@ -186,6 +186,19 @@ p{margin:0}
 .consulta-acoes{display:flex;flex-wrap:wrap;gap:12px}
 .relacionadas{padding:72px 0 88px;border-top:1px solid var(--linha)}
 
+/* ---------- Compra online ---------- */
+.compra{margin:0 0 26px;padding:0 0 26px;border-bottom:1px solid var(--linha)}
+.compra[hidden]{display:none}
+.compra h2{font-size:1.2rem;margin-bottom:6px}
+.compra-valor{font-family:var(--serif);font-size:1.7rem;color:var(--tinta);margin:0 0 14px!important}
+.compra label{display:block;font-size:.85rem;color:var(--suave);margin-bottom:6px}
+.compra .campo{margin-bottom:14px;max-width:420px}
+.compra .botao{min-width:200px}
+.compra .botao[disabled]{opacity:.6;cursor:wait}
+.compra-nota{margin:14px 0 0!important;font-size:.85rem}
+.compra-erro{margin:12px 0 0!important;color:#8A2D2D!important;font-size:.9rem}
+.compra-erro[hidden]{display:none}
+
 /* ---------- Prévia (visualizador PDF) ---------- */
 .previa-cabecalho{display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:18px;margin:24px 0}
 .previa-cabecalho h1{font-size:clamp(1.6rem,3vw,2.2rem);margin-top:8px}

@@ -26,3 +26,8 @@ O e-mail e o número de WhatsApp ficam em `assets/editorial.js` (`CONFIG`) e nos
 ## Visualizador de prévia
 
 Usa PDF.js 3.11.174, carregado do cdnjs somente quando uma prévia é aberta. Se a biblioteca não carregar, a página oferece o botão "Abrir em nova aba".
+
+## Checkout online
+
+Compra por cartão de crédito e Pix com entrega automática por e-mail (Mercado Pago Checkout Pro + Cloudflare Workers).
+Veja `CHECKOUT.md` e a pasta `worker/`. Sem configuração, o site segue apenas com a consulta pelo WhatsApp.

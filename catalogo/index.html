@@ -235,6 +235,7 @@
               </div>` : ""}
 
               <div class="consulta">
+                <div id="compraOnline" class="compra" hidden></div>
                 <p>Consulte valores e condições de aquisição pelo WhatsApp. A mensagem já identifica esta publicação.</p>
                 <div class="consulta-acoes">
                   <a class="botao" href="${E.esc(whatsapp)}" target="_blank" rel="noopener">Consultar pelo WhatsApp</a>
@@ -258,6 +259,63 @@
             <div class="grade">${outras.map((x) => E.cartao(x, "#/produto/")).join("")}</div>
           </div>
         </section>` : ""}`;
+    };
+
+    /* Compra online: só aparece se o backend estiver configurado e o produto tiver preço e arquivo. */
+    const iniciarCompraOnline = async (p) => {
+      const alvo = document.getElementById("compraOnline");
+      if (!alvo) return;
+      const item = (await E.catalogoCompra()).get(p.slug);
+      if (!item || !document.body.contains(alvo)) return;
+      alvo.innerHTML = `
+        <form id="formCompra" novalidate>
+          <h2>Comprar com cartão de crédito ou Pix</h2>
+          <p class="compra-valor">${E.esc(item.price)}</p>
+          <label for="emailCompra">E-mail para receber os arquivos</label>
+          <input class="campo" id="emailCompra" type="email" name="email" autocomplete="email" inputmode="email" required placeholder="seu@email.com">
+          <label for="emailConfirmacao">Confirme o e-mail</label>
+          <input class="campo" id="emailConfirmacao" type="email" name="emailConfirmacao" autocomplete="off" inputmode="email" required placeholder="repita o e-mail">
+          <button class="botao" type="submit">Comprar agora</button>
+          <p class="compra-nota">Pagamento seguro pelo Mercado Pago. Os links individuais de download chegam por e-mail assim que o pagamento é confirmado.</p>
+          <p class="compra-erro" id="erroCompra" role="alert" hidden></p>
+        </form>`;
+      alvo.hidden = false;
+      const form = alvo.querySelector("#formCompra");
+      const erro = alvo.querySelector("#erroCompra");
+      form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const email = form.email.value.trim();
+        const botao = form.querySelector("button");
+        erro.hidden = true;
+        if (!form.email.checkValidity() || !email) {
+          erro.textContent = "Informe um e-mail válido para receber os arquivos.";
+          erro.hidden = false;
+          form.email.focus();
+          return;
+        }
+        if (form.emailConfirmacao.value.trim().toLowerCase() !== email.toLowerCase()) {
+          erro.textContent = "Os e-mails não conferem. Confira para que os arquivos cheguem ao endereço certo.";
+          erro.hidden = false;
+          form.emailConfirmacao.focus();
+          return;
+        }
+        botao.disabled = true;
+        botao.textContent = "Abrindo o pagamento…";
+        try {
+          window.location.assign(await E.iniciarCompra(p.slug, email));
+        } catch (falha) {
+          const mensagens = {
+            email_invalido: "Informe um e-mail válido para receber os arquivos.",
+            muitas_tentativas: "Muitas tentativas em pouco tempo. Aguarde alguns minutos e tente novamente.",
+            checkout_indisponivel: "O pagamento online está indisponível no momento. Consulte pelo WhatsApp."
+          };
+          erro.textContent = mensagens[falha.codigo]
+            || "Não foi possível iniciar o pagamento agora. Tente novamente ou consulte pelo WhatsApp.";
+          erro.hidden = false;
+          botao.disabled = false;
+          botao.textContent = "Comprar agora";
+        }
+      });
     };
 
     const paginaPrevia = (slug) => {
@@ -511,6 +569,8 @@
       document.title = titulo ? `${titulo} — Catálogo de publicações` : TITULO_PADRAO;
       marcarNavegacao(caminho);
       window.scrollTo({ top: 0 });
+
+      if (caminho.startsWith("/produto/") && produtoAtual) iniciarCompraOnline(produtoAtual);
 
       if (caminho.startsWith("/previa/") && produtoAtual && produtoAtual.previa) {
         iniciarVisualizador(produtoAtual);

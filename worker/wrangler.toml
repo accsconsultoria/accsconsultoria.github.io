@@ -1,0 +1,112 @@
+# Backend de checkout — dois ambientes separados (homologação e produção).
+# Nenhum segredo fica neste arquivo. O topo do arquivo NÃO tem bindings de propósito:
+# um `wrangler deploy` sem --env não publica nada utilizável. Use sempre --env.
+#
+# Produção:     accs-checkout  /  accs-checkout-db  /  accs-checkout-files   (bindings DB e BUCKET)
+# Homologação:  nomes neutros, para que os links de teste possam usar o endereço workers.dev
+#               sem a sigla na URL apresentada ao comprador.
+
+name = "accs-checkout"
+main = "src/index.js"
+compatibility_date = "2025-06-01"
+
+# Sem registro de requisições: o token do link de download trafega no caminho da URL (/d/<token>).
+# Não habilite observability/Logpush para este Worker sem antes mascarar /d/*.
+[observability]
+enabled = false
+
+# =====================================================================
+# PRODUÇÃO
+# =====================================================================
+[env.producao]
+name = "accs-checkout"
+
+[env.producao.observability]
+enabled = false
+
+[env.producao.triggers]
+# Manutenção a cada 10 min: reentrega, reconciliação de pagamentos e retenção de dados.
+crons = ["*/10 * * * *"]
+
+[env.producao.vars]
+# Origem do site (GitHub Pages): CORS, validação de Origin e páginas de retorno do pagamento.
+SITE_ORIGIN = "https://accsconsultoria.github.io"
+# Endereço deste Worker usado pelo Mercado Pago para o webhook (não é exibido ao comprador).
+# Troque pelo endereço real depois do primeiro deploy.
+WORKER_ORIGIN = "https://accs-checkout.SEU-SUBDOMINIO.workers.dev"
+# Origem NEUTRA (https, sem "accs") usada nos links de download enviados ao comprador.
+# Deve apontar para este Worker (domínio próprio + rota). Vazio = checkout desativado (falha segura).
+DOWNLOAD_ORIGIN = ""
+# "true" habilita Pix; "false" deixa só cartão de crédito. Parcelamento: condições padrão do Mercado Pago.
+ENABLE_PIX = "true"
+MP_ENV = "prod"
+LINK_TTL_HOURS = "168"
+MAX_DOWNLOADS = "5"
+EMAIL_FROM = "Publicações <pedidos@SEU-DOMINIO>"
+SUPPORT_EMAIL = "consultoria.accs@gmail.com"
+# Limitação de requisições em /api/checkout (por IP e por e-mail) e tolerância do timestamp do webhook.
+RATE_IP_MAX = "10"
+RATE_IP_WINDOW_SECONDS = "600"
+RATE_EMAIL_MAX = "5"
+RATE_EMAIL_WINDOW_SECONDS = "3600"
+WEBHOOK_TOLERANCE_SECONDS = "900"
+# Retenção de dados pessoais (valores iniciais; validar com o proprietário/assessoria jurídica).
+RETENTION_UNPAID_DAYS = "30"
+RETENTION_PERSONAL_DATA_DAYS = "1825"
+# Preços e arquivos: veja catalog.example.json. Enquanto estiver vazio, nenhum produto é vendável.
+CATALOG_JSON = "[]"
+
+[[env.producao.d1_databases]]
+binding = "DB"
+database_name = "accs-checkout-db"
+database_id = "PREENCHER-APOS-wrangler-d1-create"
+
+[[env.producao.r2_buckets]]
+binding = "BUCKET"
+bucket_name = "accs-checkout-files"
+
+# =====================================================================
+# HOMOLOGAÇÃO (credenciais de TESTE do Mercado Pago; dados separados da produção)
+# =====================================================================
+[env.homologacao]
+name = "pub-checkout-homolog"
+
+[env.homologacao.observability]
+enabled = false
+
+[env.homologacao.triggers]
+crons = ["*/10 * * * *"]
+
+[env.homologacao.vars]
+SITE_ORIGIN = "https://accsconsultoria.github.io"
+WORKER_ORIGIN = "https://pub-checkout-homolog.SEU-SUBDOMINIO.workers.dev"
+# O endereço workers.dev deste Worker (nome neutro) pode ser usado aqui na homologação.
+DOWNLOAD_ORIGIN = ""
+ENABLE_PIX = "true"
+MP_ENV = "test"
+LINK_TTL_HOURS = "168"
+MAX_DOWNLOADS = "5"
+EMAIL_FROM = "Publicações <pedidos@SEU-DOMINIO>"
+SUPPORT_EMAIL = "consultoria.accs@gmail.com"
+RATE_IP_MAX = "10"
+RATE_IP_WINDOW_SECONDS = "600"
+RATE_EMAIL_MAX = "5"
+RATE_EMAIL_WINDOW_SECONDS = "3600"
+WEBHOOK_TOLERANCE_SECONDS = "900"
+RETENTION_UNPAID_DAYS = "30"
+RETENTION_PERSONAL_DATA_DAYS = "1825"
+CATALOG_JSON = "[]"
+
+[[env.homologacao.d1_databases]]
+binding = "DB"
+database_name = "pub-checkout-db-homolog"
+database_id = "PREENCHER-APOS-wrangler-d1-create"
+
+[[env.homologacao.r2_buckets]]
+binding = "BUCKET"
+bucket_name = "pub-checkout-files-homolog"
+
+# Segredos, SEPARADOS por ambiente (cadastrar com `wrangler secret put <NOME> --env <ambiente>`):
+#   MP_ACCESS_TOKEN     token de acesso do Mercado Pago (teste na homologação, produção em producao)
+#   MP_WEBHOOK_SECRET   assinatura secreta do webhook (também é a base dos tokens de download)
+#   RESEND_API_KEY      chave de API do provedor de e-mail (Resend)
