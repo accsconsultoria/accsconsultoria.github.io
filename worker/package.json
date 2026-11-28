@@ -1,0 +1,16 @@
+{
+  "name": "checkout-worker",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Backend de checkout (Mercado Pago Checkout Pro) e entrega digital, em Cloudflare Workers + D1 + R2.",
+  "scripts": {
+    "test": "node --test test/checkout.test.mjs",
+    "deploy": "wrangler deploy",
+    "dev": "wrangler dev"
+  },
+  "devDependencies": {
+    "miniflare": "^4.20260730.0",
+    "wrangler": "^4.169.0"
+  }
+}

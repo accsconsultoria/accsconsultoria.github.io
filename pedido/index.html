@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Situação do pagamento</title>
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="theme-color" content="#FAF8F3">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/editorial.css">
+</head>
+<body>
+  <main class="container" style="padding:96px 0 120px;max-width:680px">
+    <span class="rotulo">Pedido</span>
+    <h1 id="titulo" style="font-size:clamp(1.8rem,4vw,2.5rem);margin:14px 0 16px">Situação do pagamento</h1>
+    <p id="texto" style="font-size:1.05rem">Consultando…</p>
+    <p style="margin-top:34px">
+      <a class="botao" href="../catalogo/#/catalogo">Voltar ao catálogo</a>
+    </p>
+  </main>
+  <script>
+    (function () {
+      var status = new URLSearchParams(window.location.search).get("status");
+      var mensagens = {
+        success: ["Pagamento recebido", "Assim que o pagamento for confirmado, enviamos os links individuais de download para o e-mail informado na compra. Isso costuma levar poucos minutos. Se não encontrar a mensagem, confira a caixa de spam."],
+        pending: ["Pagamento em análise", "O pagamento ainda está sendo processado (como no Pix ou em análises do cartão). Os links de download são enviados por e-mail automaticamente quando ele for confirmado."],
+        failure: ["Pagamento não concluído", "O pagamento não foi aprovado e nenhuma cobrança foi confirmada. Você pode voltar à publicação e tentar novamente, ou consultar o atendimento pelo WhatsApp."]
+      };
+      var m = mensagens[status] || ["Situação do pagamento", "Os links de download são enviados por e-mail depois da confirmação do pagamento."];
+      document.getElementById("titulo").textContent = m[0];
+      document.getElementById("texto").textContent = m[1];
+      document.title = m[0];
+    })();
+  </script>
+</body>
+</html>

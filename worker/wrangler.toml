@@ -1,0 +1,37 @@
+# Backend de checkout. Nenhum segredo fica neste arquivo.
+name = "checkout"
+main = "src/index.js"
+compatibility_date = "2025-06-01"
+
+[vars]
+# Origem do site (GitHub Pages), usada em CORS e nas páginas de retorno.
+SITE_ORIGIN = "https://accsconsultoria.github.io"
+# Endereço público deste Worker (usado no webhook e nos links de download).
+# Troque pelo endereço real depois do primeiro deploy.
+WORKER_ORIGIN = "https://checkout.SEU-SUBDOMINIO.workers.dev"
+# "true" habilita Pix; "false" deixa só cartão de crédito.
+ENABLE_PIX = "true"
+# "test" usa o endereço de homologação do Checkout Pro quando disponível; "prod" em produção.
+MP_ENV = "test"
+# Validade e limite de downloads de cada link entregue.
+LINK_TTL_HOURS = "168"
+MAX_DOWNLOADS = "5"
+# Remetente e contato de suporte dos e-mails (o domínio precisa estar verificado no provedor).
+EMAIL_FROM = "Publicações <pedidos@SEU-DOMINIO>"
+SUPPORT_EMAIL = "consultoria.accs@gmail.com"
+# Preços e arquivos: veja catalog.example.json. Enquanto estiver vazio, nenhum produto é vendável.
+CATALOG_JSON = "[]"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "checkout"
+database_id = "PREENCHER-APOS-wrangler-d1-create"
+
+[[r2_buckets]]
+binding = "FILES"
+bucket_name = "publicacoes-privadas"
+
+# Segredos (cadastrar com `wrangler secret put <NOME>`):
+#   MP_ACCESS_TOKEN     token de acesso do Mercado Pago (teste ou produção)
+#   MP_WEBHOOK_SECRET   assinatura secreta do webhook (painel do Mercado Pago)
+#   RESEND_API_KEY      chave de API do provedor de e-mail (Resend)

@@ -10,6 +10,10 @@
 
   const CONFIG = {
     whatsapp: "https://wa.me/5561981594773",
+    /* Endereço do backend de checkout (Cloudflare Worker), sem barra no final.
+       Enquanto estiver vazio, o botão de compra online não aparece e o site funciona
+       somente com a consulta pelo WhatsApp. Veja CHECKOUT.md. */
+    checkoutApi: window.CHECKOUT_API || "",
     whatsappExibicao: "(61) 98159-4773",
     email: "consultoria.accs@gmail.com",
     local: "Brasília — Distrito Federal, Brasil",
@@ -172,8 +176,45 @@
     });
   };
 
+  /* ---------- Compra online (Mercado Pago, via backend de checkout) ---------- */
+  let cacheCompra = null;
+
+  /* Produtos vendáveis online: só os que têm preço e arquivo cadastrados no backend. */
+  const catalogoCompra = async () => {
+    if (!CONFIG.checkoutApi) return new Map();
+    if (cacheCompra) return cacheCompra;
+    try {
+      const resposta = await fetch(`${CONFIG.checkoutApi}/api/catalogo`);
+      if (!resposta.ok) throw new Error(`HTTP ${resposta.status}`);
+      const dados = await resposta.json();
+      cacheCompra = new Map((dados.produtos || []).map((p) => [p.slug, p]));
+    } catch (erro) {
+      console.warn("Compra online indisponível:", erro);
+      cacheCompra = new Map();
+    }
+    return cacheCompra;
+  };
+
+  /* Cria o pedido no backend (que define o preço) e leva ao Checkout Pro. */
+  const iniciarCompra = async (slug, email) => {
+    const resposta = await fetch(`${CONFIG.checkoutApi}/api/checkout`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ slug, email })
+    });
+    const dados = await resposta.json().catch(() => ({}));
+    if (!resposta.ok || !dados.url) {
+      const erro = new Error(dados.erro || `HTTP ${resposta.status}`);
+      erro.codigo = dados.erro;
+      throw erro;
+    }
+    return dados.url;
+  };
+
   global.Editorial = {
     CONFIG,
+    catalogoCompra,
+    iniciarCompra,
     esc,
     semAcento,
     areaNome,
