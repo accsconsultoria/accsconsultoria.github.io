@@ -2,156 +2,593 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Publicações para concursos públicos — Catálogo editorial</title>
-  <meta name="description" content="Publicações digitais especializadas para concursos públicos, organizadas por área profissional, com conteúdo teórico e questões comentadas.">
+  <meta name="viewport" content="width=1280">
+  <title>Publicações para concursos públicos — Conteúdos digitais para aprendizado e prática</title>
+  <meta name="description" content="Publicações digitais especializadas para concursos públicos, com conteúdo teórico e questões comentadas. Consulte pelo WhatsApp.">
+  <meta name="author" content="Publicações para concursos públicos">
   <meta name="robots" content="index, follow">
-  <meta name="theme-color" content="#FAF8F3">
-  <link rel="canonical" href="https://accsconsultoria.github.io/">
+  <meta name="theme-color" content="#050505">
   <meta property="og:type" content="website">
   <meta property="og:title" content="Publicações para concursos públicos">
-  <meta property="og:description" content="Publicações digitais especializadas, organizadas por área profissional, com conteúdo teórico e questões comentadas.">
-  <meta property="og:url" content="https://accsconsultoria.github.io/">
+  <meta property="og:description" content="Materiais educacionais em PDF, prévias autorizadas e atendimento direto pelo WhatsApp.">
   <meta property="og:site_name" content="Publicações para concursos públicos">
+  <link rel="canonical" href="https://accsconsultoria.github.io/">
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="assets/editorial.css">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": "Publicações para concursos públicos",
+    "url": "https://accsconsultoria.github.io/",
+    "email": "consultoria.accs@gmail.com",
+    "description": "Vitrine digital de materiais educacionais em PDF."
+  }
+  </script>
+
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4.3.5/dist/index.global.js"></script>
+  <script type="importmap">
+  { "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js" } }
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/lenis@1.1.13/dist/lenis.min.js" defer></script>
+
+  <style>
+    :root{
+      --bg:#050505;
+      --bg-2:#0b0b0d;
+      --texto:#F4F4F5;
+      --muted:#A1A1AA;
+      --linha:rgba(255,255,255,.08);
+      --vidro:rgba(255,255,255,.035);
+      --indigo:#6366F1;
+      --cyan:#06B6D4;
+      --indigo-escuro:#4338CA;
+      --cyan-escuro:#0E7490;
+      --raio:22px;
+      --ease:cubic-bezier(.2,.8,.2,1);
+    }
+    *{box-sizing:border-box}
+    html{scroll-behavior:auto;-webkit-text-size-adjust:100%}
+    body{
+      margin:0;
+      min-height:100vh;
+      background:
+        radial-gradient(1100px 620px at 85% -8%, rgba(99,102,241,.20), transparent 60%),
+        radial-gradient(900px 560px at -5% 35%, rgba(6,182,212,.12), transparent 60%),
+        var(--bg);
+      background-attachment:fixed;
+      color:var(--texto);
+      font-family:'Inter',system-ui,-apple-system,'Segoe UI',sans-serif;
+      font-size:16px;
+      line-height:1.6;
+      -webkit-font-smoothing:antialiased;
+      overflow-x:hidden;
+    }
+    h1,h2,h3{font-family:'Syne',system-ui,sans-serif;letter-spacing:-.02em;line-height:1.05;margin:0}
+    p{margin:0}
+    a{color:inherit}
+    img,canvas,svg{display:block;max-width:100%}
+    .mono{font-family:'JetBrains Mono',ui-monospace,monospace;font-size:.75rem;letter-spacing:.08em;text-transform:uppercase}
+    .container{width:min(1180px,calc(100% - 40px));margin-inline:auto}
+    .sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+    .skip{position:absolute;left:12px;top:-60px;background:var(--texto);color:var(--bg);padding:10px 14px;border-radius:10px;z-index:100}
+    .skip:focus{top:12px}
+    :focus-visible{outline:2px solid var(--cyan);outline-offset:3px;border-radius:8px}
+
+    /* Botões */
+    .btn{
+      display:inline-flex;align-items:center;justify-content:center;gap:10px;
+      padding:15px 26px;border-radius:999px;font-weight:600;font-size:.95rem;text-decoration:none;
+      border:1px solid var(--linha);color:var(--texto);background:var(--vidro);
+      backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+      transition:transform .35s var(--ease),background .3s,border-color .3s,box-shadow .3s;
+      will-change:transform;
+    }
+    .btn:hover{border-color:rgba(255,255,255,.2);background:rgba(255,255,255,.07)}
+    .btn-primario{
+      background:linear-gradient(135deg,var(--indigo-escuro),var(--cyan-escuro));
+      border-color:transparent;color:#fff;
+      box-shadow:0 14px 40px -12px rgba(99,102,241,.7);
+    }
+    .btn-primario:hover{background:linear-gradient(135deg,var(--indigo-escuro),var(--cyan-escuro));box-shadow:0 18px 50px -10px rgba(6,182,212,.6)}
+    .magnetic{transition:transform .4s var(--ease)}
+
+    /* Cabeçalho */
+    .topo{
+      position:fixed;inset:0 0 auto 0;z-index:50;
+      background:rgba(5,5,5,.55);
+      backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+      border-bottom:1px solid var(--linha);
+    }
+    .topo-interno{height:72px;display:flex;align-items:center;justify-content:space-between;gap:20px}
+    .marca{display:flex;align-items:center;gap:12px;text-decoration:none;font-family:'Syne',sans-serif;font-weight:700;letter-spacing:.02em}
+    .marca-sigla{
+      flex:0 0 auto;height:38px;min-width:38px;padding:0 10px;border-radius:999px;display:inline-grid;place-items:center;
+      border:1px solid rgba(255,255,255,.22);font-size:.72rem;font-weight:800;letter-spacing:.06em;white-space:nowrap;
+    }
+                        .topo-cta{padding:11px 18px;font-size:.85rem}
+
+    /* Hero */
+    .hero{position:relative;min-height:100vh;display:flex;align-items:center;padding:92px 0 36px;overflow:hidden;isolation:isolate}
+    .hero-canvas{position:absolute;inset:0;width:100%;height:100%;z-index:-1;opacity:.95}
+    .hero-orb{
+      position:absolute;z-index:-2;width:min(70vw,620px);aspect-ratio:1;border-radius:50%;
+      right:-12%;top:12%;filter:blur(40px);opacity:.55;
+      background:radial-gradient(circle at 35% 35%,rgba(99,102,241,.9),rgba(6,182,212,.35) 55%,transparent 70%);
+    }
+    .hero-badge{
+      display:inline-flex;align-items:center;gap:10px;padding:8px 14px;border-radius:999px;
+      border:1px solid var(--linha);background:var(--vidro);color:var(--muted);
+    }
+    .hero-badge i{width:8px;height:8px;border-radius:50%;background:var(--cyan);box-shadow:0 0 12px var(--cyan)}
+    .hero-title{font-size:clamp(2.6rem,min(6.6vw,9.4vh),5.6rem);font-weight:800;margin:26px 0 24px;max-width:11.5ch}
+    .word{display:inline-block;overflow:hidden;vertical-align:top;padding-bottom:.08em;margin-right:.18em}
+    .word>span{display:inline-block}
+    .grad{background:linear-gradient(120deg,#A5B4FC 0%,var(--indigo) 35%,var(--cyan) 100%);-webkit-background-clip:text;background-clip:text;color:transparent}
+    .hero-sub{font-size:clamp(1.02rem,1.6vw,1.22rem);color:var(--muted);max-width:52ch}
+    .hero-actions{display:flex;flex-wrap:wrap;gap:16px;margin-top:36px}
+    .hero-actions .btn{padding:21px 40px;font-size:1.1rem;font-weight:600;letter-spacing:.01em}
+    .hero-actions .btn-primario{
+      box-shadow:0 0 0 1px rgba(255,255,255,.14) inset,0 18px 50px -10px rgba(99,102,241,.9),0 0 40px -6px rgba(6,182,212,.55);
+      animation:brilho-cta 3.2s ease-in-out infinite;
+    }
+    .hero-actions .btn-primario:hover{box-shadow:0 0 0 1px rgba(255,255,255,.2) inset,0 22px 60px -8px rgba(99,102,241,1),0 0 56px -4px rgba(6,182,212,.75)}
+    .hero-actions .btn:not(.btn-primario){
+      border:1.5px solid rgba(255,255,255,.55);background:rgba(255,255,255,.1);color:#fff;
+    }
+    .hero-actions .btn:not(.btn-primario):hover{background:rgba(255,255,255,.18);border-color:#fff}
+    @keyframes brilho-cta{
+      0%,100%{box-shadow:0 0 0 1px rgba(255,255,255,.14) inset,0 18px 50px -10px rgba(99,102,241,.9),0 0 40px -6px rgba(6,182,212,.55)}
+      50%{box-shadow:0 0 0 1px rgba(255,255,255,.2) inset,0 22px 64px -8px rgba(99,102,241,1),0 0 64px 0 rgba(6,182,212,.75)}
+    }
+
+    /* Seções */
+    section{position:relative}
+    .secao{padding:120px 0}
+    .rotulo{color:var(--cyan);margin-bottom:18px;display:block}
+    .titulo-secao{font-size:clamp(2.1rem,4.6vw,3.7rem);font-weight:700;max-width:18ch}
+    .lead{color:var(--muted);max-width:60ch;margin-top:20px;font-size:1.05rem}
+    .cabecalho{margin-bottom:60px}
+
+    /* Bento */
+    .bento{display:grid;grid-template-columns:repeat(6,1fr);gap:18px}
+    .bento-card{
+      position:relative;overflow:hidden;border-radius:var(--raio);padding:30px;
+      border:1px solid var(--linha);
+      background:linear-gradient(180deg,rgba(255,255,255,.05),rgba(255,255,255,.015));
+      backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+      transform-style:preserve-3d;transition:transform .45s var(--ease),border-color .4s;
+      min-height:230px;display:flex;flex-direction:column;justify-content:space-between;gap:24px;
+    }
+    .bento-card::before{
+      content:"";position:absolute;inset:0;pointer-events:none;opacity:0;transition:opacity .4s;
+      background:radial-gradient(420px circle at var(--mx,50%) var(--my,50%),rgba(99,102,241,.22),rgba(6,182,212,.08) 40%,transparent 70%);
+    }
+    .bento-card:hover::before{opacity:1}
+    .bento-card:hover{border-color:rgba(255,255,255,.16)}
+    .bento-card h3{font-size:1.35rem;font-weight:700}
+    .bento-card p{color:var(--muted);margin-top:10px;font-size:.95rem}
+    .bento-ico{width:44px;height:44px;border-radius:14px;display:grid;place-items:center;border:1px solid var(--linha);background:rgba(99,102,241,.12);color:#C7D2FE}
+    .c-1{grid-column:span 4;grid-row:span 2;min-height:480px}
+    .c-2{grid-column:span 2}
+    .c-3{grid-column:span 2}
+    .c-4{grid-column:span 2}
+    .c-5{grid-column:span 2}
+    .c-6{grid-column:span 2}
+    .bento-visual{
+      margin-top:auto;border-radius:16px;border:1px dashed rgba(255,255,255,.12);
+      padding:18px;display:grid;gap:10px;background:rgba(0,0,0,.25);
+    }
+    .bento-visual div{height:10px;border-radius:999px;background:linear-gradient(90deg,var(--indigo),var(--cyan));opacity:.85}
+    .bento-visual div:nth-child(2){width:72%;opacity:.55}
+    .bento-visual div:nth-child(3){width:48%;opacity:.35}
+
+    /* Scrollytelling */
+    .story{height:min(300vh,2700px)}
+    .story-sticky{position:sticky;top:0;height:min(100vh,900px);display:flex;align-items:center;overflow:hidden}
+    .story-grid{display:grid;grid-template-columns:1fr 1.1fr;gap:70px;align-items:center;width:100%}
+    .story-steps{display:grid;gap:14px;position:relative;padding-left:26px}
+    .story-track{position:absolute;left:0;top:6px;bottom:6px;width:2px;background:var(--linha);border-radius:2px;overflow:hidden}
+    .story-track span{display:block;height:100%;background:linear-gradient(var(--indigo),var(--cyan));transform-origin:top;transform:scaleY(0)}
+    .story-step{padding:20px 22px;border-radius:18px;border:1px solid transparent;opacity:.42;transition:opacity .5s,border-color .5s,background .5s}
+    .story-step.ativo{opacity:1;border-color:var(--linha);background:var(--vidro)}
+    .story-step h3{font-size:1.5rem;font-weight:700}
+    .story-step p{color:var(--muted);margin-top:8px;max-width:44ch}
+    .story-stage{position:relative;height:420px}
+    .story-visual{
+      position:absolute;inset:0;border-radius:var(--raio);border:1px solid var(--linha);
+      background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.01));
+      padding:34px;opacity:0;transform:translateY(24px) scale(.98);
+      transition:opacity .7s var(--ease),transform .7s var(--ease);display:flex;flex-direction:column;justify-content:center;gap:16px;
+    }
+    .story-visual.ativo{opacity:1;transform:none}
+    .story-visual h4{font-family:'Syne',sans-serif;font-size:1.4rem}
+    .bolha{align-self:flex-end;max-width:90%;padding:16px 18px;border-radius:18px 18px 4px 18px;background:linear-gradient(135deg,var(--indigo-escuro),var(--cyan-escuro));font-size:.95rem}
+    .checklist{display:grid;gap:12px;list-style:none;padding:0;margin:0}
+    .checklist li{display:flex;align-items:center;gap:12px;color:var(--muted)}
+    .checklist li::before{content:"";width:18px;height:18px;border-radius:50%;border:1px solid var(--cyan);box-shadow:inset 0 0 0 4px rgba(6,182,212,.25)}
+
+    /* Produtos */
+    .planos{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:24px;align-items:stretch}
+    .plano{position:relative;border-radius:var(--raio);padding:1px;background:var(--linha)}
+    .plano-inner{
+      height:100%;border-radius:calc(var(--raio) - 1px);padding:32px;background:#0b0b0d;
+      display:flex;flex-direction:column;gap:18px;
+    }
+    .plano-destaque{background:none}
+    .plano-destaque::before{
+      content:"";position:absolute;inset:-1px;border-radius:inherit;padding:1.5px;
+      background:conic-gradient(from var(--angle),var(--indigo),var(--cyan),#A5B4FC,var(--indigo));
+      -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);
+      -webkit-mask-composite:xor;mask-composite:exclude;
+      animation:girar 6s linear infinite;
+    }
+    @property --angle{syntax:'<angle>';initial-value:0deg;inherits:false}
+    @keyframes girar{to{--angle:360deg}}
+    .plano-selo{align-self:flex-start;padding:6px 10px;border-radius:999px;background:rgba(99,102,241,.18);color:#C7D2FE}
+    .plano-cat{color:var(--cyan)}
+    .plano h3{font-size:1.7rem;font-weight:700}
+    .plano-desc{color:var(--muted)}
+    .plano-preco{font-family:'Syne',sans-serif;font-weight:700;font-size:1.5rem}
+    .plano-lista{list-style:none;margin:0;padding:0;display:grid;gap:10px;color:var(--muted);font-size:.95rem}
+    .plano-lista li{position:relative;padding-left:22px}
+    .plano-lista li::before{content:"";position:absolute;left:0;top:10px;width:8px;height:8px;border-radius:50%;background:var(--cyan)}
+    .plano-formato{color:var(--muted);margin-top:auto}
+    .plano .btn{width:100%}
+    .plano-previa{text-align:center;color:var(--muted);font-size:.9rem;text-decoration:underline;text-underline-offset:4px}
+    .aviso-box{padding:40px;border-radius:var(--raio);border:1px solid var(--linha);background:var(--vidro);text-align:center;color:var(--muted)}
+    .ver-todos{margin-top:40px;text-align:center}
+
+    /* Contato */
+    .contato{
+      border-radius:32px;padding:clamp(40px,6vw,80px);border:1px solid var(--linha);
+      background:radial-gradient(700px 320px at 90% 0%,rgba(99,102,241,.25),transparent 70%),radial-gradient(500px 260px at 0% 100%,rgba(6,182,212,.18),transparent 70%),var(--bg-2);
+      display:grid;grid-template-columns:1.2fr 1fr;gap:40px;align-items:center;
+    }
+    .contato h2{font-size:clamp(2.2rem,5vw,4rem);font-weight:800}
+    .contato-links{display:grid;gap:14px}
+    .contato-links a{color:var(--texto);text-decoration:none;padding:16px 18px;border-radius:16px;border:1px solid var(--linha);background:var(--vidro);display:flex;justify-content:space-between;align-items:center;transition:border-color .3s}
+    .contato-links a:hover{border-color:rgba(255,255,255,.2)}
+    .contato-links span{color:var(--muted);font-size:.9rem}
+
+    /* Rodapé */
+    .rodape{border-top:1px solid var(--linha);padding:44px 0;color:var(--muted);font-size:.9rem}
+    .rodape-interno{display:flex;flex-wrap:wrap;justify-content:space-between;gap:20px;align-items:center}
+    .rodape nav{display:flex;flex-wrap:wrap;gap:20px}
+    .rodape a{text-decoration:none}
+    .rodape a:hover{color:var(--texto)}
+
+    /* Revelação inicial (sem JS, o conteúdo permanece visível) */
+    .reveal{will-change:transform,opacity}
+
+    /* Responsividade */
+    @media (max-width:1024px){
+      .bento{grid-template-columns:repeat(2,1fr)}
+      .c-1{grid-column:span 2;grid-row:auto;min-height:320px}
+      .c-2,.c-3,.c-4,.c-5,.c-6{grid-column:span 1}
+      .story-grid{grid-template-columns:1fr;gap:40px}
+      .story{height:auto}
+      .story-sticky{position:relative;height:auto;padding:90px 0}
+      .story-stage{height:360px}
+      .contato{grid-template-columns:1fr}
+    }
+    @media (max-width:767px){
+      .container{width:min(100%,calc(100% - 32px))}
+      .secao{padding:84px 0}
+      .hero{padding:118px 0 70px;min-height:auto}
+      .hero-canvas{display:none}
+      .hero-orb{opacity:.7;width:90vw;right:-30%;top:4%}
+      .bento{grid-template-columns:1fr}
+      .c-1,.c-2,.c-3,.c-4,.c-5,.c-6{grid-column:span 1}
+      .bento-card{min-height:auto;padding:24px}
+      .story-stage{height:330px}
+      .story-visual{padding:24px}
+      .btn{width:100%}
+      .hero-actions .btn{width:100%}
+      .contato-links a{flex-direction:column;align-items:flex-start;gap:4px}
+    }
+    @media (prefers-reduced-motion:reduce){
+      *,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}
+      .story-visual{opacity:1;transform:none}
+      .story-step{opacity:1}
+    }
+  </style>
 </head>
 <body>
-  <a class="pular" href="#conteudo">Pular para o conteúdo</a>
+  <a class="skip" href="#principal">Pular para o conteúdo</a>
 
-  <header class="cabecalho">
-    <div class="container cabecalho-interno">
-      <a class="identidade" href="./" aria-label="Publicações para concursos públicos — início">
-        <span class="identidade-marca" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
-        <span class="identidade-texto">
-          <strong>Publicações</strong>
-          <span>Concursos públicos</span>
-        </span>
+  <header class="topo">
+    <div class="container topo-interno">
+      <a class="marca" href="#inicio" aria-label="Publicações para concursos públicos — início">
+        <span>Publicações para concursos públicos</span>
       </a>
 
-      <button class="menu-botao" id="menuBotao" type="button" aria-label="Abrir menu" aria-expanded="false" aria-controls="navegacao">
-        <span></span><span></span><span></span>
-      </button>
-
-      <nav class="navegacao" id="navegacao" aria-label="Navegação principal">
-        <a href="./" aria-current="page">Início</a>
-        <a href="catalogo/#/catalogo">Catálogo</a>
-        <a href="#lancamentos">Lançamentos</a>
-        <a href="#sobre">Sobre as publicações</a>
-        <a href="#contato">Contato</a>
-      </nav>
+      <a class="btn btn-primario topo-cta magnetic" href="https://wa.me/5561981594773?text=Ol%C3%A1!%20Tenho%20interesse%20nas%20publica%C3%A7%C3%B5es%20do%20cat%C3%A1logo." target="_blank" rel="noopener">Falar no WhatsApp</a>
     </div>
   </header>
 
-  <main id="conteudo">
-    <section class="apresentacao" aria-labelledby="titulo-inicio">
-      <div class="container apresentacao-grade">
-        <div>
-          <span class="rotulo">Publicações digitais · Concursos públicos</span>
-          <h1 id="titulo-inicio">Publicações especializadas para concursos públicos.</h1>
-          <p class="introducao">Obras digitais organizadas por área profissional, com conteúdo teórico, questões comentadas e a identificação do concurso, do cargo e da banca examinadora.</p>
-          <div class="apresentacao-acoes">
-            <a class="botao" href="catalogo/#/catalogo">Ver catálogo completo</a>
-            <a class="botao botao-contorno" data-whatsapp-geral href="https://wa.me/5561981594773?text=Ol%C3%A1!%20Tenho%20interesse%20nas%20publica%C3%A7%C3%B5es%20do%20cat%C3%A1logo." target="_blank" rel="noopener">Consultar pelo WhatsApp</a>
-          </div>
+  <main id="principal">
+
+    <!-- HERO -->
+    <section class="hero" id="inicio" aria-labelledby="titulo-hero">
+      <div class="hero-orb" aria-hidden="true"></div>
+      <canvas class="hero-canvas" id="hero-canvas" aria-hidden="true"></canvas>
+
+      <div class="container">
+        <span class="hero-badge mono"><i aria-hidden="true"></i>Vitrine digital · Materiais educacionais</span>
+
+        <h1 class="hero-title" id="titulo-hero">
+          <span class="word"><span>Conteúdo</span></span>
+          <span class="word"><span>digital</span></span>
+          <span class="word"><span>para</span></span>
+          <span class="word"><span class="grad">aprendizado</span></span>
+          <span class="word"><span>e</span></span>
+          <span class="word"><span class="grad">prática.</span></span>
+        </h1>
+
+        <p class="hero-sub">Conteúdos digitais selecionados para aprendizado, prática e desenvolvimento profissional. Conheça o material, veja uma prévia autorizada e fale diretamente com o atendimento.</p>
+
+        <div class="hero-actions">
+          <a class="btn btn-primario magnetic" href="https://wa.me/5561981594773?text=Ol%C3%A1!%20Tenho%20interesse%20nas%20publica%C3%A7%C3%B5es%20do%20cat%C3%A1logo.%20Gostaria%20de%20conhecer%20os%20valores%20e%20as%20condi%C3%A7%C3%B5es%20de%20aquisi%C3%A7%C3%A3o." target="_blank" rel="noopener">Comprar pelo WhatsApp</a>
+          <a class="btn magnetic" href="catalogo/#/catalogo">Explorar catálogo</a>
         </div>
-        <div class="vitrine-capas" id="vitrineCapas" aria-hidden="true">
-          <div class="geo">
-            <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
-            <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
-            <i></i><i></i><i></i><i></i><i></i><i></i>
-          </div>
-        </div>
+
       </div>
     </section>
 
-    <section class="secao" id="lancamentos" aria-labelledby="titulo-lancamentos">
-      <div class="container">
-        <div class="secao-cabecalho">
-          <div>
-            <span class="rotulo">Lançamentos</span>
-            <h2 id="titulo-lancamentos">Publicações recentes</h2>
-            <p>As obras mais recentes do catálogo, com acesso à apresentação completa de cada publicação.</p>
-          </div>
-          <a class="link-seta" href="catalogo/#/catalogo">Ver catálogo completo →</a>
-        </div>
-        <div class="grade" id="listaLancamentos" aria-live="polite">
-          <p class="vazio">Carregando publicações…</p>
-        </div>
-      </div>
-    </section>
-
-    <section class="secao" id="sobre" aria-labelledby="titulo-sobre">
-      <div class="container">
-        <div class="secao-cabecalho">
-          <div>
-            <span class="rotulo">Sobre as publicações</span>
-            <h2 id="titulo-sobre">Uma coleção pensada para o estudo direcionado.</h2>
-          </div>
-        </div>
-        <div class="principios">
-          <article class="principio">
-            <h3>Organização por área e cargo</h3>
-            <p>Cada obra identifica o concurso, o cargo e a banca examinadora, e organiza o conteúdo em volumes ou capítulos temáticos.</p>
-          </article>
-          <article class="principio">
-            <h3>Teoria e questões comentadas</h3>
-            <p>O conteúdo teórico é acompanhado de itens no formato da banca, com comentários e explicações.</p>
-          </article>
-          <article class="principio">
-            <h3>Formato digital e atendimento direto</h3>
-            <p>As publicações são entregues em PDF. A consulta e a aquisição são feitas pelo WhatsApp, e o envio é individual, após a confirmação do pagamento.</p>
-          </article>
-        </div>
-      </div>
-    </section>
   </main>
 
-  <footer class="rodape" id="contato">
-    <div class="container">
-      <div class="rodape-grade">
-        <div>
-          <h2>Publicações para concursos públicos</h2>
-          <p>Publicações digitais especializadas, organizadas por área profissional, para a preparação em concursos públicos.</p>
-        </div>
-        <div>
-          <h2>Contato</h2>
-          <ul>
-            <li>E-mail: <a href="mailto:consultoria.accs@gmail.com">consultoria.accs@gmail.com</a></li>
-            <li>WhatsApp: <a data-whatsapp-geral href="https://wa.me/5561981594773" target="_blank" rel="noopener">(61) 98159-4773</a></li>
-            <li>Brasília — Distrito Federal, Brasil</li>
-          </ul>
-        </div>
-      </div>
-      <div class="rodape-base">© <span id="anoAtual">2026</span> Todos os direitos reservados.</div>
-    </div>
-  </footer>
 
-  <script src="assets/editorial.js"></script>
-  <script>
-    (async () => {
-      const E = window.Editorial;
-      E.iniciarCabecalho();
+  <script type="module">
+    import * as THREE from 'three';
 
-      const { publicacoes, erro } = await E.carregar("");
-      const recentes = E.maisRecentes(publicacoes);
+    /* ---------- Constantes e utilitários ---------- */
+    const WHATSAPP = 'https://wa.me/5561981594773';
+    const MENSAGEM_GERAL = 'Olá! Tenho interesse nas publicações do catálogo. Gostaria de conhecer os valores e as condições de aquisição.';
+    const linkWhatsapp = (msg = MENSAGEM_GERAL) => `${WHATSAPP}?text=${encodeURIComponent(msg)}`;
+    const esc = (s = '') => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+    const reduzir = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const ponteiroFino = matchMedia('(pointer: fine)').matches;
+    const pequeno = matchMedia('(max-width: 767px)').matches;
+    const RÓTULOS = { ebooks: 'E-books', 'livros-digitais': 'Livros digitais', pdfs: 'PDFs', apostilas: 'Apostilas', cursos: 'Cursos' };
 
-      const lista = document.getElementById("listaLancamentos");
-      lista.innerHTML = recentes.length
-        ? recentes.slice(0, 3).map((p) => E.cartao(p, "catalogo/#/produto/")).join("")
-        : `<p class="vazio">${erro ? "Não foi possível carregar as publicações agora." : "Novas publicações em breve."}</p>`;
 
-      const vitrine = document.getElementById("vitrineCapas");
-      recentes.filter((p) => p.capa).slice(0, 2).forEach((p) => {
-        const capa = document.createElement("div");
-        capa.className = "vitrine-capa";
-        capa.innerHTML = `<img src="${E.esc(p.capa)}" alt="">`;
-        vitrine.appendChild(capa);
+    /* ---------- Hero 3D: nuvem procedural reativa ao mouse ---------- */
+    function iniciarHero() {
+      const canvas = document.getElementById('hero-canvas');
+      if (!canvas || reduzir || pequeno) return;
+      let renderer;
+      try {
+        renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true, powerPreference: 'low-power' });
+      } catch (erro) {
+        return; // sem WebGL: permanece o gradiente de fundo
+      }
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
+
+      const cena = new THREE.Scene();
+      const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 100);
+      camera.position.z = 5.2;
+
+      const total = 2000;
+      const base = new Float32Array(total * 3);
+      const posicao = new Float32Array(total * 3);
+      const cor = new Float32Array(total * 3);
+      const indigo = new THREE.Color('#6366F1');
+      const cyan = new THREE.Color('#06B6D4');
+      const c = new THREE.Color();
+      for (let i = 0; i < total; i++) {
+        // distribuição de Fibonacci sobre a esfera
+        const y = 1 - (i / (total - 1)) * 2;
+        const raio = Math.sqrt(1 - y * y);
+        const teta = i * Math.PI * (3 - Math.sqrt(5));
+        const x = Math.cos(teta) * raio;
+        const z = Math.sin(teta) * raio;
+        base.set([x, y, z], i * 3);
+        posicao.set([x, y, z], i * 3);
+        c.copy(indigo).lerp(cyan, (y + 1) / 2);
+        cor.set([c.r, c.g, c.b], i * 3);
+      }
+
+      const geo = new THREE.BufferGeometry();
+      geo.setAttribute('position', new THREE.BufferAttribute(posicao, 3));
+      geo.setAttribute('color', new THREE.BufferAttribute(cor, 3));
+      const pontos = new THREE.Points(geo, new THREE.PointsMaterial({
+        size: 0.04, vertexColors: true, transparent: true, opacity: 0.9, depthWrite: false
+      }));
+      const malha = new THREE.Mesh(
+        new THREE.IcosahedronGeometry(1.02, 2),
+        new THREE.MeshBasicMaterial({ color: 0x6366f1, wireframe: true, transparent: true, opacity: 0.1 })
+      );
+      const grupo = new THREE.Group();
+      grupo.add(pontos, malha);
+      cena.add(grupo);
+
+      const alvo = { x: 0, y: 0 };
+      const atual = { x: 0, y: 0 };
+      window.addEventListener('pointermove', (e) => {
+        alvo.x = e.clientX / window.innerWidth - 0.5;
+        alvo.y = e.clientY / window.innerHeight - 0.5;
+      }, { passive: true });
+
+      const redimensionar = () => {
+        const w = canvas.clientWidth;
+        const h = canvas.clientHeight;
+        renderer.setSize(w, h, false);
+        camera.aspect = w / h;
+        camera.updateProjectionMatrix();
+        // Esfera ampliada: à direita em telas largas, limitada à largura em telas estreitas
+        const alturaVisivel = 2 * Math.tan((camera.fov * Math.PI) / 360) * camera.position.z;
+        const larguraVisivel = alturaVisivel * camera.aspect;
+        const largo = camera.aspect > 1.2;
+        grupo.scale.setScalar(largo ? 1.75 : Math.min(1.75, (larguraVisivel * 0.94) / 2));
+        // Sobe a esfera: a folga vertical acompanha a altura visível da tela
+        grupo.position.set(largo ? Math.min(1.2, larguraVisivel / 2 - 1.75) : 0, alturaVisivel * 0.17, 0);
+      };
+      redimensionar();
+      window.addEventListener('resize', redimensionar);
+
+      let visivel = true;
+      new IntersectionObserver(([entrada]) => { visivel = entrada.isIntersecting; }).observe(canvas);
+
+      const relogio = new THREE.Clock();
+      const quadro = () => {
+        requestAnimationFrame(quadro);
+        if (!visivel) return;
+        const t = relogio.getElapsedTime();
+        const p = geo.attributes.position.array;
+        for (let i = 0; i < total; i++) {
+          const j = i * 3;
+          const k = 1 + 0.08 * Math.sin(base[j] * 3 + t * 1.4) * Math.cos(base[j + 1] * 3 - t);
+          p[j] = base[j] * k;
+          p[j + 1] = base[j + 1] * k;
+          p[j + 2] = base[j + 2] * k;
+        }
+        geo.attributes.position.needsUpdate = true;
+        atual.x += (alvo.x - atual.x) * 0.04;
+        atual.y += (alvo.y - atual.y) * 0.04;
+        grupo.rotation.y = t * 0.08 + atual.x * 0.8;
+        grupo.rotation.x = atual.y * 0.6;
+        renderer.render(cena, camera);
+      };
+      quadro();
+    }
+    iniciarHero();
+
+    /* ---------- Produtos vindos de data/publicacoes.json ---------- */
+    const grade = document.getElementById('planos-grade');
+
+    const cartaoProduto = (p, destaque) => {
+      const msg = `Olá! Tenho interesse no produto ${p.nome}. Gostaria de conhecer os valores e as condições de aquisição.`;
+      const itens = (p.conteudo || []).slice(0, 5).map((i) => `<li>${esc(i)}</li>`).join('');
+      return `
+        <article class="plano ${destaque ? 'plano-destaque' : ''} reveal">
+          <div class="plano-inner">
+            ${destaque ? '<span class="plano-selo mono">Destaque</span>' : ''}
+            <span class="mono plano-cat">${esc(RÓTULOS[p.categoria] || 'Material')}</span>
+            <h3>${esc(p.nome)}</h3>
+            <p class="plano-desc">${esc(p.descricaoCurta)}</p>
+            <div class="plano-preco">${p.preco ? esc(p.preco) : 'Consulte valores'}</div>
+            ${itens ? `<ul class="plano-lista">${itens}</ul>` : ''}
+            ${p.formato ? `<p class="mono plano-formato">Entrega: ${esc(p.formato)}</p>` : ''}
+            <a class="btn btn-primario magnetic" href="${linkWhatsapp(msg)}" target="_blank" rel="noopener">Comprar pelo WhatsApp</a>
+            ${p.previa ? `<a class="plano-previa" href="catalogo/#/previa/${encodeURIComponent(p.slug)}">Ver prévia</a>` : ''}
+          </div>
+        </article>`;
+    };
+
+    async function carregarProdutos() {
+      try {
+        const resposta = await fetch('data/publicacoes.json', { cache: 'no-cache' });
+        if (!resposta.ok) throw new Error(`HTTP ${resposta.status}`);
+        const dados = await resposta.json();
+        const lista = (dados.publicacoes || []).filter((p) => p && p.slug && p.nome);
+        if (!lista.length) {
+          grade.innerHTML = `<div class="aviso-box">Novos materiais em breve. <br><a class="btn btn-primario" style="margin-top:20px" href="${linkWhatsapp()}" target="_blank" rel="noopener">Falar no WhatsApp</a></div>`;
+          return;
+        }
+        const destaque = lista.find((p) => p.destaque) || lista[0];
+        grade.innerHTML = lista.map((p) => cartaoProduto(p, p === destaque)).join('');
+        animarNovosCartoes();
+      } catch (erro) {
+        console.warn('Não foi possível carregar os produtos:', erro);
+        grade.innerHTML = `<div class="aviso-box">Não foi possível carregar os materiais agora. <br><a class="btn btn-primario" style="margin-top:20px" href="${linkWhatsapp()}" target="_blank" rel="noopener">Falar no WhatsApp</a></div>`;
+      }
+    }
+
+    /* ---------- GSAP, ScrollTrigger e Lenis ---------- */
+    const temGsap = typeof window.gsap !== 'undefined' && typeof window.ScrollTrigger !== 'undefined';
+    let lenis = null;
+
+    if (temGsap) {
+      gsap.registerPlugin(ScrollTrigger);
+
+      if (typeof window.Lenis !== 'undefined' && !reduzir) {
+        lenis = new Lenis({ duration: 1.15, smoothWheel: true, wheelMultiplier: 0.9 });
+        lenis.on('scroll', ScrollTrigger.update);
+        gsap.ticker.add((tempo) => lenis.raf(tempo * 1000));
+        gsap.ticker.lagSmoothing(0);
+      }
+
+      if (!reduzir) {
+      // Revelação inicial do hero
+      const entrada = gsap.timeline({ defaults: { ease: 'power4.out' } });
+      entrada
+        .from('.hero-badge', { opacity: 0, y: 12, duration: 0.6 })
+        .from('.hero-title .word > span', { yPercent: 110, duration: 1.1, stagger: 0.07 }, '-=0.3')
+        .from('.hero-sub, .hero-actions', { opacity: 0, y: 24, duration: 0.9, stagger: 0.12 }, '-=0.7');
+
+      // Revelações por rolagem
+      gsap.utils.toArray('.reveal').forEach((el) => {
+        gsap.from(el, {
+          opacity: 0, y: 40, duration: 1, ease: 'power3.out',
+          scrollTrigger: { trigger: el, start: 'top 88%', once: true }
+        });
       });
-    })();
+
+
+      }
+
+    }
+
+    /* Animação de cartões de produto após carregamento */
+    function animarNovosCartoes() {
+      if (!temGsap || reduzir) return;
+      gsap.from('.plano', {
+        opacity: 0, y: 40, duration: 0.9, ease: 'power3.out', stagger: 0.12, clearProps: 'opacity,transform',
+        scrollTrigger: { trigger: '#planos-grade', start: 'top 85%', once: true }
+      });
+      ativarTilt();
+    }
+
+    /* ---------- Botões magnéticos ---------- */
+    if (ponteiroFino && !reduzir) {
+      document.querySelectorAll('.magnetic').forEach((el) => {
+        el.addEventListener('pointermove', (e) => {
+          const r = el.getBoundingClientRect();
+          const x = e.clientX - r.left - r.width / 2;
+          const y = e.clientY - r.top - r.height / 2;
+          el.style.transform = `translate(${x * 0.22}px, ${y * 0.32}px)`;
+        });
+        el.addEventListener('pointerleave', () => { el.style.transform = ''; });
+      });
+    }
+
+    /* ---------- Bento e cartões: spotlight e inclinação 3D ---------- */
+    function ativarTilt() {
+      if (!ponteiroFino || reduzir) return;
+      document.querySelectorAll('.bento-card, .plano').forEach((card) => {
+        if (card.dataset.tilt) return;
+        card.dataset.tilt = '1';
+        card.addEventListener('pointermove', (e) => {
+          const r = card.getBoundingClientRect();
+          const px = (e.clientX - r.left) / r.width;
+          const py = (e.clientY - r.top) / r.height;
+          card.style.setProperty('--mx', `${px * 100}%`);
+          card.style.setProperty('--my', `${py * 100}%`);
+          card.style.transform = `perspective(900px) rotateX(${(0.5 - py) * 6}deg) rotateY(${(px - 0.5) * 8}deg)`;
+        });
+        card.addEventListener('pointerleave', () => { card.style.transform = ''; });
+      });
+    }
+    ativarTilt();
+
+    /* ---------- Navegação por âncoras com Lenis ---------- */
+    document.querySelectorAll('a[href^="#"]').forEach((a) => {
+      a.addEventListener('click', (e) => {
+        const destino = document.querySelector(a.getAttribute('href'));
+        if (!destino) return;
+        if (lenis) {
+          e.preventDefault();
+          lenis.scrollTo(destino, { offset: -72 });
+        }
+      });
+    });
+
   </script>
 </body>
 </html>
